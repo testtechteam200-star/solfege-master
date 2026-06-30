@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="bg" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Солфеж Асистент 👩‍🏫 | Преподавателски кабинет</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- abcjs CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/abcjs@6.3.0/dist/abcjs-basic-min.js"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #090d16 0%, #111029 50%, #200a2b 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(18, 24, 38, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card {
+            background: rgba(25, 30, 48, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+        .glass-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateY(-1px);
+        }
+        .glass-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+        .glass-btn.active {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(168, 85, 247, 0.5);
+        }
+        input[type="checkbox"] {
+            accent-color: #a855f7;
+        }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col items-center p-3 sm:p-6 overflow-x-hidden pb-12">
+
+    <!-- Header -->
+    <header class="w-full max-w-5xl text-center mb-6 mt-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-semibold uppercase tracking-wider mb-2">
+            ✨ Кабинет по Солфеж
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            Солфеж Асистент 👩‍🏫
+        </h1>
+        <p class="text-slate-400 text-xs sm:text-sm mt-1">
+            Инструментариум за генериране на диктовки, задачи и слухови упражнения
+        </p>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="w-full max-w-5xl glass rounded-2xl p-1.5 flex gap-1 mb-6 shadow-xl overflow-x-auto">
+        <button id="tab-dictation" onclick="switchTab('dictation')" class="flex-1 min-w-[120px] py-3 text-center rounded-xl font-semibold transition-all duration-200 bg-indigo-600 shadow-md">
+            ✍️ Диктовки
+        </button>
+        <button id="tab-chains" onclick="switchTab('chains')" class="flex-1 min-w-[120px] py-3 text-center rounded-xl font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200">
+            ⛓️ Слухови вериги
+        </button>
+        <button id="tab-builder" onclick="switchTab('builder')" class="flex-1 min-w-[120px] py-3 text-center rounded-xl font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200">
+            🎹 Построител
+        </button>
+        <button id="tab-singing" onclick="switchTab('singing')" class="flex-1 min-w-[120px] py-3 text-center rounded-xl font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200">
+            🎤 Интонация
+        </button>
+    </div>
+
+    <!-- MAIN SUITE WRAPPER -->
+    <main class="w-full max-w-5xl flex flex-col gap-6">
+
+        <!-- ================= TAB: MELODIC & RHYTHMIC DICTATIONS ================= -->
+        <section id="view-dictation" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Settings Panel -->
+            <div class="lg:col-span-5 glass rounded-3xl p-5 sm:p-6 flex flex-col gap-5 shadow-xl">
+                <div>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-1.5">
+                        ⚙️ Настройки на диктовката
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Персонализирай параметрите на генериране</p>
+                </div>
+
+                <!-- Grade Selector -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="dict-grade" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Клас (Трудност)</label>
+                    <select id="dict-grade" onchange="applyGradeDictationDefaults(this.value)" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="1">1 клас (Много лесно)</option>
+                        <option value="2">2 клас (Много лесно)</option>
+                        <option value="3">3 клас (Лесно)</option>
+                        <option value="4" selected>4 клас (Средно)</option>
+                        <option value="5">5 клас (Средно)</option>
+                        <option value="6">6 клас (Трудно)</option>
+                        <option value="7">7 клас (Трудно)</option>
+                        <option value="8">8 клас (Напреднали)</option>
+                        <option value="9">9 клас (Напреднали)</option>
+                        <option value="10">10 клас (Майстори)</option>
+                        <option value="11">11 клас (Майстори)</option>
+                        <option value="12">12 клас (Майстори)</option>
+                    </select>
+                </div>
+
+                <!-- Dictation Type Toggle -->
+                <div class="grid grid-cols-2 gap-2 bg-slate-900/40 p-1 rounded-xl border border-slate-800/80">
+                    <button id="btn-dict-type-melodic" onclick="setDictationType('melodic')" class="py-2 text-center rounded-lg text-xs font-semibold bg-indigo-600 shadow">
+                        Мелодическа
+                    </button>
+                    <button id="btn-dict-type-rhythmic" onclick="setDictationType('rhythmic')" class="py-2 text-center rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
+                        Ритмическа
+                    </button>
+                </div>
+
+                <!-- Tonalities (only visible for melodic) -->
+                <div id="settings-key-wrapper" class="flex flex-col gap-1.5">
+                    <label for="dict-key" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Тоналност</label>
+                    <select id="dict-key" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="C" selected>До мажор (C major)</option>
+                        <option value="Am">ла минор (A minor)</option>
+                        <option value="G">Сол мажор (G major)</option>
+                        <option value="Em">ми минор (E minor)</option>
+                        <option value="F">Фа мажор (F major)</option>
+                        <option value="Dm">ре минор (D minor)</option>
+                        <option value="D">Ре мажор (D major)</option>
+                        <option value="Bm">си минор (B minor)</option>
+                        <option value="Bb">Си бемол мажор (Bb major)</option>
+                        <option value="Gm">сол минор (G minor)</option>
+                        <option value="A">Ла мажор (A major)</option>
+                        <option value="F#m">фа диез минор (F# minor)</option>
+                    </select>
+                </div>
+
+                <!-- Meter / Time Signature -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="dict-meter" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Размер</label>
+                    <select id="dict-meter" onchange="updateRhythmicOptions()" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <optgroup label="Равноделни">
+                            <option value="2/4" selected>2/4</option>
+                            <option value="3/4">3/4</option>
+                            <option value="4/4">4/4</option>
+                        </optgroup>
+                        <optgroup label="Неравноделни (Български фолклор)">
+                            <option value="5/8">5/8 (2+3 - Пайдушко)</option>
+                            <option value="7/8">7/8 (3+2+2 - Ръченица)</option>
+                            <option value="9/8">9/8 (2+2+2+3 - Дайчово)</option>
+                            <option value="11/8">11/8 (3+2+2+2+2 - Копаница)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Allowed Leaps / Jumps (Melodic only) -->
+                <div id="settings-leaps-wrapper" class="flex flex-col gap-2">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Разрешени интервални скокове</span>
+                    <div class="grid grid-cols-2 gap-2 bg-slate-900/20 p-3 rounded-xl border border-slate-800/40">
+                        <label class="flex items-center gap-2 text-xs text-slate-300">
+                            <input type="checkbox" id="leap-step" checked disabled>
+                            <span>Постепенно (секунди)</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-xs text-slate-300">
+                            <input type="checkbox" id="leap-3rd" checked>
+                            <span>Терци</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-xs text-slate-300">
+                            <input type="checkbox" id="leap-4th-5th" checked>
+                            <span>Кварти & Квинти</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-xs text-slate-300">
+                            <input type="checkbox" id="leap-6th-7th">
+                            <span>Сексти & Септими</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-xs text-slate-300 col-span-2">
+                            <input type="checkbox" id="leap-8ve">
+                            <span>Октави (големи скокове)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Allowed Rhythms -->
+                <div class="flex flex-col gap-2">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Ритмически фигури</span>
+                    <div id="rhythm-checkboxes" class="grid grid-cols-2 gap-2 bg-slate-900/20 p-3 rounded-xl border border-slate-800/40">
+                        <!-- Populated dynamically based on meter -->
+                    </div>
+                </div>
+
+                <!-- Tempo & Length -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="dict-length" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Дължина (такта)</label>
+                        <select id="dict-length" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                            <option value="4" selected>4 такта</option>
+                            <option value="8">8 такта</option>
+                            <option value="12">12 такта</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label for="dict-tempo-val" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Темпо (BPM)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="dict-tempo-val" value="80" min="40" max="180" class="bg-slate-800 text-slate-100 rounded-xl px-2 py-2 border border-slate-700 text-sm w-16 text-center focus:outline-none">
+                            <span class="text-xs text-slate-400">BPM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Synth Sound Selection -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="dict-synth" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Тембър на изсвирване</label>
+                    <select id="dict-synth" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="piano">Пиано (меко)</option>
+                        <option value="bell">Металофон / Камбанки</option>
+                        <option value="sine">Чист тон (синусоида)</option>
+                    </select>
+                </div>
+
+                <!-- Generate Action -->
+                <button onclick="generateDictation()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-2xl text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 mt-2">
+                    ✨ ГЕНЕРИРАЙ ДИКТОВКА
+                </button>
+            </div>
+
+            <!-- Visual and Interactive Output -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                <!-- Action Bar & Audio Players -->
+                <div class="glass rounded-3xl p-5 flex flex-col gap-4 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="text-md font-bold text-slate-100 uppercase tracking-wide">Контролен Панел</h3>
+                            <span id="output-meta-text" class="text-xs text-indigo-400">Генерирана: До мажор, размер 2/4</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <!-- Metronome Click toggle -->
+                            <label class="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer">
+                                <input type="checkbox" id="dict-metronome-click" checked>
+                                <span>Метрономен предтакт</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                        <button id="btn-play-tuning" onclick="playTuning()" class="glass-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
+                            🎹 Настройка (Каданс)
+                        </button>
+                        <button id="btn-play-dict" onclick="playCurrentDictation()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
+                            ▶️ Изсвири диктовката
+                        </button>
+                        <button id="btn-stop-audio" onclick="stopAudio()" class="glass-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center gap-1.5">
+                            ⏹️ Спри звука
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sheet Music Display (abcjs container) -->
+                <div class="glass rounded-3xl p-6 shadow-xl flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Нотен текст (Визуализация)</span>
+                        <div class="flex gap-2">
+                            <button onclick="toggleNotesVisibility()" id="btn-toggle-notes" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all">
+                                👁️ Скрий Нотите (за ученици)
+                            </button>
+                            <button onclick="copyABCCode()" class="glass-btn text-xs font-semibold px-3 py-1.5 rounded-lg">
+                                📋 Копирай ABC код
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Render Area -->
+                    <div id="dictation-notation-container" class="bg-white/95 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[160px]">
+                        <div id="dictation-notation-render" class="w-full"></div>
+                    </div>
+
+                    <!-- ABC Editor -->
+                    <div class="flex flex-col gap-2 mt-2">
+                        <label for="dictation-abc-editor" class="text-xs font-semibold text-slate-400">Ръчна корекция на ABC кода:</label>
+                        <textarea id="dictation-abc-editor" rows="3" onchange="renderEditedABC()" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl p-3 font-mono text-xs text-emerald-400 focus:ring-2 focus:ring-purple-500 focus:outline-none" placeholder="Нотен текст..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ================= TAB: EAR TRAINING CHAINS ================= -->
+        <section id="view-chains" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 glass rounded-3xl p-6 flex flex-col gap-5 shadow-xl">
+                <div>
+                    <h3 class="text-lg font-bold text-white">⛓️ Генератор на слухови вериги</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Възпроизвеждане на последователни стъпки от интервали или акорди</p>
+                </div>
+
+                <!-- Grade Selector -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="chains-grade" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Клас (Сложност на връзките)</label>
+                    <select id="chains-grade" onchange="applyGradeChainsDefaults(this.value)" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="1">1 клас</option>
+                        <option value="2">2-3 клас</option>
+                        <option value="4" selected>4-5 клас</option>
+                        <option value="6">6-7 клас</option>
+                        <option value="8">8-12 клас</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="chain-type" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Тип на веригата</label>
+                    <select id="chain-type" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="interval">Интервална верига (напр. тон -> нагоре терца -> надолу кварта)</option>
+                        <option value="chord">Акордова последователност (напр. I - IV - V - I)</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="chain-base" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Начален тон / Тоналност</label>
+                    <select id="chain-base" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="60">До 1 октава (C4)</option>
+                        <option value="62">Ре 1 октава (D4)</option>
+                        <option value="64">Ми 1 октава (E4)</option>
+                        <option value="65">Фа 1 октава (F4)</option>
+                        <option value="67">Сол 1 октава (G4)</option>
+                        <option value="69">Ла 1 октава (A4)</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="chain-steps-count" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Брой стъпки</label>
+                    <select id="chain-steps-count" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="3">3 стъпки</option>
+                        <option value="5" selected>5 стъпки</option>
+                        <option value="7">7 стъпки</option>
+                    </select>
+                </div>
+
+                <button onclick="generateChain()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-2xl text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 mt-2">
+                    ⛓️ ГЕНЕРИРАЙ ВЕРИГА
+                </button>
+            </div>
+
+            <!-- Output panel -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                <div class="glass rounded-3xl p-5 flex flex-col gap-4 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="text-md font-bold text-slate-100 uppercase tracking-wide">Изсвирване на веригата</h3>
+                            <span id="chain-meta-text" class="text-xs text-indigo-400">Генерирана верига от 5 елемента</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="playCurrentChain()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
+                            ▶️ Изсвири веригата
+                        </button>
+                        <button onclick="stopAudio()" class="glass-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center gap-1.5">
+                            ⏹️ Спри звука
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass rounded-3xl p-6 shadow-xl flex flex-col gap-4">
+                    <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Стъпки (Теоретично описание & Ноти)</span>
+                    
+                    <!-- Text representation of the chain -->
+                    <div id="chain-steps-display" class="flex flex-col gap-2 p-3 bg-slate-900/40 rounded-2xl border border-slate-800/60 min-h-[80px] justify-center text-sm text-slate-300">
+                        <!-- Dynamic content -->
+                    </div>
+
+                    <!-- Render Area -->
+                    <div id="chain-notation-container" class="bg-white/95 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
+                        <div id="chain-notation-render" class="w-full"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: BUILDER (SINGLE INTERVALS/CHORDS) ================= -->
+        <section id="view-builder" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 glass rounded-3xl p-6 flex flex-col gap-5 shadow-xl">
+                <div>
+                    <h3 class="text-lg font-bold text-white">🎹 Ръчен построител на елементи</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Построй единичен интервал или акорд от произволен тон</p>
+                </div>
+
+                <!-- Grade Selector -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="builder-grade" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Клас (Достъпни елементи)</label>
+                    <select id="builder-grade" onchange="updateBuilderElements()" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="1">1 клас</option>
+                        <option value="2">2-3 клас</option>
+                        <option value="4" selected>4-5 клас</option>
+                        <option value="6">6-7 клас</option>
+                        <option value="8">8-12 клас</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="builder-type" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Тип на конструкцията</label>
+                    <select id="builder-type" onchange="updateBuilderElements()" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="interval" selected>Интервал</option>
+                        <option value="chord">Акорд</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="builder-element" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Елемент</label>
+                    <select id="builder-element" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <!-- Dynamic -->
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="builder-base-pitch" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Начален тон (MIDI)</label>
+                    <select id="builder-base-pitch" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="60" selected>До 1 октава (C4)</option>
+                        <option value="61">До диез 1 октава (C#4)</option>
+                        <option value="62">Ре 1 октава (D4)</option>
+                        <option value="63">Ми бемол 1 октава (Eb4)</option>
+                        <option value="64">Ми 1 октава (E4)</option>
+                        <option value="65">Фа 1 октава (F4)</option>
+                        <option value="66">Фа диез 1 октава (F#4)</option>
+                        <option value="67">Сол 1 октава (G4)</option>
+                        <option value="68">Ла бемол 1 октава (Ab4)</option>
+                        <option value="69">Ла 1 октава (A4)</option>
+                        <option value="70">Си бемол 1 октава (Bb4)</option>
+                        <option value="71">Си 1 октава (B4)</option>
+                        <option value="72">До 2 октава (C5)</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="builder-play-mode" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Посока / Начин на изсвирване</label>
+                    <select id="builder-play-mode" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="up" selected>Възходящ мелодичен (↑)</option>
+                        <option value="down">Низходящ мелодичен (↓)</option>
+                        <option value="harmonic">Хармоничен (едновременно)</option>
+                    </select>
+                </div>
+
+                <button onclick="buildElement()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-2xl text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 mt-2">
+                    🛠️ СТРОИ ЕЛЕМЕНТ
+                </button>
+            </div>
+
+            <!-- Output panel -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                <div class="glass rounded-3xl p-5 flex flex-col gap-4 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="text-md font-bold text-slate-100 uppercase tracking-wide">Контрол</h3>
+                            <span id="builder-meta-text" class="text-xs text-indigo-400">Построен елемент</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="playBuilderElement()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
+                            ▶️ Изсвири елемента
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass rounded-3xl p-6 shadow-xl flex flex-col gap-4">
+                    <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Нотна визуализация</span>
+                    
+                    <!-- Render Area -->
+                    <div id="builder-notation-container" class="bg-white/95 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
+                        <div id="builder-notation-render" class="w-full"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB: INTONATION & SIGHT SINGING ================= -->
+        <section id="view-singing" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 glass rounded-3xl p-6 flex flex-col gap-5 shadow-xl">
+                <div>
+                    <h3 class="text-lg font-bold text-white">🎤 Интонационен конструктор</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Задачи за пеене a prima vista (от пръв поглед) или от зададен тон</p>
+                </div>
+
+                <!-- Grade Selector -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="singing-grade" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Клас (Сложност на пеенето)</label>
+                    <select id="singing-grade" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="1">1 клас (Много лесно)</option>
+                        <option value="2">2-3 клас (Лесно)</option>
+                        <option value="4" selected>4-5 клас (Средно)</option>
+                        <option value="6">6-7 клас (Трудно)</option>
+                        <option value="8">8-12 клас (Професионално)</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="singing-task" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Тип интонационна задача</label>
+                    <select id="singing-task" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="sight-singing">Генерирай мелодия за пеене a prima vista (4 такта)</option>
+                        <option value="sing-from-note">Задача "Изпей от даден тон" (карта за ученика)</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label for="singing-key" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Тоналност / Тон</label>
+                    <select id="singing-key" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
+                        <option value="C" selected>До мажор / Тон До (C)</option>
+                        <option value="Am">ла минор / Тон Ла (Am)</option>
+                        <option value="G">Сол мажор / Тон Сол (G)</option>
+                        <option value="Em">ми минор / Тон Ми (Em)</option>
+                        <option value="F">Фа мажор / Тон Фа (F)</option>
+                        <option value="Dm">ре минор / Тон Ре (Dm)</option>
+                    </select>
+                </div>
+
+                <button onclick="generateSingingTask()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3.5 rounded-2xl text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 mt-2">
+                    🎤 СЪЗДАЙ ЗАДАЧА
+                </button>
+            </div>
+
+            <!-- Output panel -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                <div class="glass rounded-3xl p-5 flex flex-col gap-4 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="text-md font-bold text-slate-100 uppercase tracking-wide">Задача за изпяване</h3>
+                            <span id="singing-meta-text" class="text-xs text-indigo-400">Генериран тон / мелодия</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button id="btn-singing-play" onclick="playSingingReference()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
+                            ▶️ Изсвири опорния тон
+                        </button>
+                        <button id="btn-singing-play-full" onclick="playSingingFull()" class="glass-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                            🎹 Изсвири цялата мелодия (за проверка)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Output Card -->
+                <div class="glass rounded-3xl p-6 shadow-xl flex flex-col gap-4">
+                    <!-- Instruction card text (for cards mode) -->
+                    <div id="singing-card-text" class="hidden p-5 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-800/40 rounded-2xl text-center text-lg font-bold text-purple-200">
+                        Изпей чиста квинта нагоре от тон Ре, след което се разреши в До мажор!
+                    </div>
+
+                    <!-- Sight singing notation display -->
+                    <div id="singing-notation-container" class="bg-white/95 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
+                        <div id="singing-notation-render" class="w-full"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JS Logic -->
+    <script>
+        // ================= AUDIO ENGINE (Web Audio API) =================
+        let audioCtx = null;
+        let volumeNode = null;
+        let activeTimeouts = []; // Keeps track of queued tones to clear them on stop
+        let activeOscillators = []; // Keeps track of playing oscillators to stop them instantly
+
+        function initAudio() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            volumeNode = audioCtx.createGain();
+            volumeNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            volumeNode.connect(audioCtx.destination);
+        }
+
+        function stopAudio() {
+            // Cancel all scheduled timeouts
+            activeTimeouts.forEach(t => clearTimeout(t));
+            activeTimeouts = [];
+
+            // Stop all active oscillators instantly
+            activeOscillators.forEach(osc => {
+                try {
+                    osc.stop();
+                    osc.disconnect();
+                } catch(e) {}
+            });
+            activeOscillators = [];
+        }
+
+        function midiToFreq(note) {
+            return 440 * Math.pow(2, (note - 69) / 12);
+        }
+
+        function playTone(note, duration, startTime, type = 'piano') {
+            initAudio();
+            const freq = midiToFreq(note);
+            if (!freq || isNaN(freq)) return;
+
+            const osc = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            activeOscillators.push(osc);
+            activeOscillators.push(osc2);
+
+            if (type === 'piano') {
+                osc.type = 'triangle';
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(freq * 2, startTime);
+                
+                gainNode.gain.setValueAtTime(0, startTime);
+                gainNode.gain.linearRampToValueAtTime(0.35, startTime + 0.015);
+                gainNode.gain.exponentialRampToValueAtTime(0.18, startTime + 0.12);
+                gainNode.gain.setValueAtTime(0.15, startTime + duration - 0.08);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+                
+                osc2.connect(gainNode);
+                osc2.start(startTime);
+                osc2.stop(startTime + duration);
+            } else if (type === 'bell') {
+                osc.type = 'sine';
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(freq * 3, startTime);
+                
+                gainNode.gain.setValueAtTime(0, startTime);
+                gainNode.gain.linearRampToValueAtTime(0.55, startTime + 0.008);
+                gainNode.gain.exponentialRampToValueAtTime(0.04, startTime + 0.18);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+                
+                osc2.connect(gainNode);
+                osc2.start(startTime);
+                osc2.stop(startTime + duration);
+            } else {
+                osc.type = 'sine';
+                gainNode.gain.setValueAtTime(0, startTime);
+                gainNode.gain.linearRampToValueAtTime(0.25, startTime + 0.04);
+                gainNode.gain.setValueAtTime(0.25, startTime + duration - 0.04);
+                gainNode.gain.linearRampToValueAtTime(0.0001, startTime + duration);
+            }
+
+            osc.frequency.setValueAtTime(freq, startTime);
+            osc.connect(gainNode);
+            gainNode.connect(volumeNode);
+
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+        }
+
+        function playClick(startTime, pitch = 700) {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            activeOscillators.push(osc);
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(pitch, startTime);
+            
+            gainNode.gain.setValueAtTime(0, startTime);
+            gainNode.gain.linearRampToValueAtTime(0.7, startTime + 0.004);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.05);
+
+            osc.connect(gainNode);
+            gainNode.connect(volumeNode);
+            osc.start(startTime);
+            osc.stop(startTime + 0.06);
+        }
+
+        // ================= DATABASES =================
+        const INTERVALS_DATA = {
+            'ч1': { name: "Чиста прима (ч1)", semitones: 0, letter: "P1" },
+            'м2': { name: "Малка секунда (м2)", semitones: 1, letter: "m2" },
+            'г2': { name: "Голяма секунда (г2)", semitones: 2, letter: "M2" },
+            'м3': { name: "Малка терца (м3)", semitones: 3, letter: "m3" },
+            'г3': { name: "Голяма терца (г3)", semitones: 4, letter: "M3" },
+            'ч4': { name: "Чиста кварта (ч4)", semitones: 5, letter: "P4" },
+            'тритонус': { name: "Тритонус (ув4/нам5)", semitones: 6, letter: "d5" },
+            'ч5': { name: "Чиста квинта (ч5)", semitones: 7, letter: "P5" },
+            'м6': { name: "Малка секста (м6)", semitones: 8, letter: "m6" },
+            'г6': { name: "Голяма секста (г6)", semitones: 9, letter: "M6" },
+            'м7': { name: "Малка септима (м7)", semitones: 10, letter: "m7" },
+            'г7': { name: "Голяма септима (г7)", semitones: 11, letter: "M7" },
+            'ч8': { name: "Чиста октава (ч8)", semitones: 12, letter: "P8" }
+        };
+
+        const CHORDS_DATA = {
+            'Б3': { name: "Мажорно тризвучие (Б3)", semitones: [0, 4, 7] },
+            'М3': { name: "Минорно тризвучие (М3)", semitones: [0, 3, 7] },
+            'Ум3': { name: "Умалено тризвучие (Ум3)", semitones: [0, 3, 6] },
+            'Ув3': { name: "Увеличено тризвучие (Ув3)", semitones: [0, 4, 8] },
+            'Б6': { name: "Мажорен секстакорд (Б6)", semitones: [0, 3, 8] },
+            'М6': { name: "Минорен секстакорд (М6)", semitones: [0, 4, 9] },
+            'Б64': { name: "Мажорен квартсекстакорд (Б64)", semitones: [0, 5, 9] },
+            'М64': { name: "Минорен квартсекстакорд (М64)", semitones: [0, 5, 8] },
+            'D7': { name: "Доминантов септакорд (D7)", semitones: [0, 4, 7, 10] },
+            'D65': { name: "Квинтсекстакорд (D65)", semitones: [0, 3, 6, 8] },
+            'D43': { name: "Терцквартакорд (D43)", semitones: [0, 3, 5, 9] },
+            'D2': { name: "Секундакорд (D2)", semitones: [0, 2, 6, 9] },
+            'M7': { name: "Голям мажорен септакорд (M7)", semitones: [0, 4, 7, 11] },
+            'm7': { name: "Малък минорен септакорд (m7)", semitones: [0, 3, 7, 10] },
+            'dim7': { name: "Умален септакорд (dim7)", semitones: [0, 3, 6, 9] }
+        };
+
+        const KEY_TONICS = {
+            'C': 60, 'Am': 57, 'G': 67, 'Em': 64, 'F': 65, 'Dm': 62, 
+            'D': 62, 'Bm': 59, 'Bb': 58, 'Gm': 55, 'A': 69, 'F#m': 66
+        };
+
+        const SCALE_STEPS = {
+            'C': [0, 2, 4, 5, 7, 9, 11, 12],
+            'G': [0, 2, 4, 5, 7, 9, 11, 12],
+            'F': [0, 2, 4, 5, 7, 9, 11, 12],
+            'D': [0, 2, 4, 5, 7, 9, 11, 12],
+            'Bb': [0, 2, 4, 5, 7, 9, 11, 12],
+            'A': [0, 2, 4, 5, 7, 9, 11, 12],
+            'Am': [0, 2, 3, 5, 7, 8, 11, 12],
+            'Em': [0, 2, 3, 5, 7, 8, 11, 12],
+            'Dm': [0, 2, 3, 5, 7, 8, 11, 12],
+            'Bm': [0, 2, 3, 5, 7, 8, 11, 12],
+            'Gm': [0, 2, 3, 5, 7, 8, 11, 12],
+            'F#m': [0, 2, 3, 5, 7, 8, 11, 12]
+        };
+
+        // ================= APP STATE =================
+        let activeTab = 'dictation';
+        let dictationType = 'melodic';
+        let currentDictation = null;
+        let currentChain = null;
+        let currentBuilderElement = null;
+        let currentSingingTask = null;
+        let isNotesVisible = true;
+
+        // ================= INIT =================
+        window.addEventListener('load', () => {
+            updateRhythmicOptions();
+            updateBuilderElements();
+            generateDictation(); // Auto-generate first
+        });
+
+        // Tab Switching
+        function switchTab(tab) {
+            activeTab = tab;
+            const tabs = ['dictation', 'chains', 'builder', 'singing'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                const view = document.getElementById(`view-${t}`);
+                if (t === tab) {
+                    btn.className = "flex-1 min-w-[120px] py-3 text-center rounded-xl font-semibold transition-all duration-200 bg-indigo-600 shadow-md text-white";
+                    view.classList.remove('hidden');
+                } else {
+                    btn.className = "flex-1 min-w-[120px] py-3 text-center rounded-xl font-semibold text-slate-400 hover:text-slate-200 transition-all duration-200";
+                    view.classList.add('hidden');
+                }
+            });
+            stopAudio();
+        }
+
+        // Toggle Dictation Type
+        function setDictationType(type) {
+            dictationType = type;
+            const melBtn = document.getElementById('btn-dict-type-melodic');
+            const rhyBtn = document.getElementById('btn-dict-type-rhythmic');
+            
+            const keyWrapper = document.getElementById('settings-key-wrapper');
+            const leapsWrapper = document.getElementById('settings-leaps-wrapper');
+
+            if (type === 'melodic') {
+                melBtn.className = "py-2 text-center rounded-lg text-xs font-semibold bg-indigo-600 shadow text-white";
+                rhyBtn.className = "py-2 text-center rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200";
+                keyWrapper.classList.remove('hidden');
+                leapsWrapper.classList.remove('hidden');
+            } else {
+                rhyBtn.className = "py-2 text-center rounded-lg text-xs font-semibold bg-indigo-600 shadow text-white";
+                melBtn.className = "py-2 text-center rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200";
+                keyWrapper.classList.add('hidden');
+                leapsWrapper.classList.add('hidden');
+            }
+            updateRhythmicOptions();
+        }
+
+        // Update rhythm options based on Meter
+        function updateRhythmicOptions() {
+            const meter = document.getElementById('dict-meter').value;
+            const container = document.getElementById('rhythm-checkboxes');
+            container.innerHTML = '';
+
+            const isUneven = ['5/8', '7/8', '9/8', '11/8'].includes(meter);
+
+            if (isUneven) {
+                // Uneven meters are mostly subdivision based (eighths and quarters)
+                container.innerHTML = `
+                    <label class="flex items-center gap-2 text-xs text-slate-300">
+                        <input type="checkbox" id="rhy-uneven-basic" checked disabled>
+                        <span>Осмини (основни)</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs text-slate-300">
+                        <input type="checkbox" id="rhy-uneven-quarter" checked>
+                        <span>Четвъртини (удължени)</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs text-slate-300 col-span-2">
+                        <input type="checkbox" id="rhy-uneven-dotted">
+                        <span>Четвъртина с точка</span>
+                    </label>
+                `;
+            } else {
+                // Standard meters (2/4, 3/4, 4/4)
+                container.innerHTML = `
+                    <label class="flex items-center gap-2 text-xs text-slate-300">
+                        <input type="checkbox" id="rhy-quarter" checked disabled>
+                        <span>Четвъртини</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs text-slate-300">
+                        <input type="checkbox" id="rhy-eighths" checked>
+                        <span>Осмини</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs text-slate-300">
+                        <input type="checkbox" id="rhy-sixteenths">
+                        <span>Шестнадесетини</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs text-slate-300">
+                        <input type="checkbox" id="rhy-dotted">
+                        <span>Осмина с точка</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs text-slate-300">
+                        <input type="checkbox" id="rhy-syncopation">
+                        <span>Синкоп (синкопиране)</span>
+                    </label>
+                    <label class="flex items-center gap-2 text-xs text-slate-300">
+                        <input type="checkbox" id="rhy-triplet">
+                        <span>Триоли (3-ни групи)</span>
+                    </label>
+                `;
+            }
+        }
+
+        // ================= DICTATION ENGINE =================
+        function generateDictation() {
+            stopAudio();
+            isNotesVisible = true;
+            document.getElementById('btn-toggle-notes').innerText = "👁️ Скрий Нотите (за ученици)";
+            document.getElementById('dictation-notation-container').classList.remove('hidden');
+
+            const key = document.getElementById('dict-key').value;
+            const meter = document.getElementById('dict-meter').value;
+            const length = parseInt(document.getElementById('dict-length').value);
+            
+            // Collect config
+            const leaps = {
+                step: true,
+                third: document.getElementById('leap-3rd').checked,
+                fourthFifth: document.getElementById('leap-4th-5th').checked,
+                sixthSeventh: document.getElementById('leap-6th-7th').checked,
+                octave: document.getElementById('leap-8ve').checked
+            };
+
+            const rhythms = {};
+            if (['5/8', '7/8', '9/8', '11/8'].includes(meter)) {
+                rhythms.quarter = document.getElementById('rhy-uneven-quarter').checked;
+                rhythms.dotted = document.getElementById('rhy-uneven-dotted').checked;
+            } else {
+                rhythms.eighths = document.getElementById('rhy-eighths').checked;
+                rhythms.sixteenths = document.getElementById('rhy-sixteenths').checked;
+                rhythms.dotted = document.getElementById('rhy-dotted').checked;
+                rhythms.syncopation = document.getElementById('rhy-syncopation').checked;
+                rhythms.triplet = document.getElementById('rhy-triplet').checked;
+            }
+
+            if (dictationType === 'melodic') {
+                currentDictation = generateMelodicDictationAlgo(key, meter, length, leaps, rhythms);
+                document.getElementById('output-meta-text').innerText = `Генерирана: ${translateKeyToBG(key)}, размер ${meter}, ${length} такта`;
+            } else {
+                currentDictation = generateRhythmicDictationAlgo(meter, length, rhythms);
+                document.getElementById('output-meta-text').innerText = `Генерирана: Ритмическа, размер ${meter}, ${length} такта`;
+            }
+
+            // Populate ABC editor
+            document.getElementById('dictation-abc-editor').value = currentDictation.abc;
+            renderNotation('dictation-notation-render', currentDictation.abc);
+        }
+
+        function translateKeyToBG(key) {
+            const translation = {
+                'C': 'До мажор (C)', 'Am': 'ла минор (Am)', 'G': 'Сол мажор (G)', 'Em': 'ми минор (Em)',
+                'F': 'Фа мажор (F)', 'Dm': 'ре минор (Dm)', 'D': 'Ре мажор (D)', 'Bm': 'си минор (Bm)',
+                'Bb': 'Си бемол мажор (Bb)', 'Gm': 'сол минор (Gm)', 'A': 'Ла мажор (A)', 'F#m': 'фа диез минор (F#m)'
+            };
+            return translation[key] || key;
+        }
+
+        // ================= ALGORITHMS: MELODY GENERATOR =================
+        function generateMelodicDictationAlgo(key, meter, length, leaps, rhythms) {
+            const tonic = KEY_TONICS[key] || 60;
+            const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
+            
+            const pitchBank = [];
+            for (let oct = -1; oct <= 1; oct++) {
+                scale.forEach(step => {
+                    pitchBank.push(tonic + step + oct * 12);
+                });
+            }
+            pitchBank.sort((a,b) => a-b);
+            
+            let currentScaleIdx = pitchBank.indexOf(tonic);
+            if (currentScaleIdx === -1) currentScaleIdx = Math.floor(pitchBank.length / 2);
+
+            let beatsPerMeasure = 2;
+            if (meter === '3/4') beatsPerMeasure = 3;
+            else if (meter === '4/4') beatsPerMeasure = 4;
+            else if (meter === '5/8') beatsPerMeasure = 2.5;
+            else if (meter === '7/8') beatsPerMeasure = 3.5;
+            else if (meter === '9/8') beatsPerMeasure = 4.5;
+            else if (meter === '11/8') beatsPerMeasure = 5.5;
+
+            const playbackNotes = [];
+            let timeAccumulator = 0;
+            const isUneven = ['5/8', '7/8', '9/8', '11/8'].includes(meter);
+
+            let abcHeader = `X:1\nT:Мелодическа диктовка\nM:${meter}\nL:1/8\nK:${key}\n`;
+            if (!isUneven) {
+                abcHeader = `X:1\nT:Мелодическа диктовка\nM:${meter}\nL:1/4\nK:${key}\n`;
+            }
+
+            let abcBody = "";
+
+            for (let m = 0; m < length; m++) {
+                let beatsInMeasure = 0;
+                const isLastMeasure = (m === length - 1);
+                let measureAbc = "";
+
+                if (isUneven) {
+                    let groupings = [2, 3];
+                    if (meter === '7/8') groupings = [3, 2, 2];
+                    else if (meter === '9/8') groupings = [2, 2, 2, 3];
+                    else if (meter === '11/8') groupings = [3, 2, 2, 2, 2];
+
+                    groupings.forEach((groupVal, groupIdx) => {
+                        let filled = 0;
+                        let groupAbc = "";
+
+                        while (filled < groupVal) {
+                            const isLastNoteOfGroup = (groupVal - filled === 1);
+                            const isFinalGroupNote = isLastMeasure && (groupIdx === groupings.length - 1) && isLastNoteOfGroup;
+
+                            if (isFinalGroupNote) {
+                                currentScaleIdx = pitchBank.indexOf(tonic);
+                            } else {
+                                currentScaleIdx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
+                            }
+
+                            const pitch = pitchBank[currentScaleIdx];
+                            let dur = 1; // 1 eighth
+                            if (groupVal - filled >= 2 && rhythms.quarter && Math.random() > 0.5) {
+                                dur = 2; // quarter note
+                            }
+
+                            playbackNotes.push({
+                                note: pitch,
+                                time: timeAccumulator,
+                                duration: dur * 0.5
+                            });
+
+                            const noteChar = midiToABCNote(pitch, key);
+                            groupAbc += dur === 2 ? `${noteChar}2` : noteChar;
+
+                            timeAccumulator += dur * 0.5;
+                            filled += dur;
+                        }
+                        measureAbc += groupAbc + " ";
+                    });
+                    abcBody += measureAbc + "| ";
+                } else {
+                    // Standard Meter (2/4, 3/4, 4/4)
+                    while (beatsInMeasure < beatsPerMeasure) {
+                        const remainingBeats = beatsPerMeasure - beatsInMeasure;
+                        const isFinalBeat = (remainingBeats <= 1.0);
+
+                        if (isLastMeasure && isFinalBeat) {
+                            // Resolve to tonic
+                            currentScaleIdx = pitchBank.indexOf(tonic);
+                            const pitch = pitchBank[currentScaleIdx];
+                            playbackNotes.push({
+                                note: pitch,
+                                time: timeAccumulator,
+                                duration: remainingBeats
+                            });
+
+                            const noteChar = midiToABCNote(pitch, key);
+                            if (remainingBeats === 1.0) {
+                                measureAbc += noteChar + " ";
+                            } else if (remainingBeats === 0.5) {
+                                measureAbc += noteChar + "/2 ";
+                            } else if (remainingBeats === 1.5) {
+                                measureAbc += noteChar + "3/2 ";
+                            } else {
+                                measureAbc += noteChar + " ";
+                            }
+
+                            timeAccumulator += remainingBeats;
+                            beatsInMeasure += remainingBeats;
+                            continue;
+                        }
+
+                        // Choose a rhythmic cell
+                        let cells = ['quarter'];
+                        if (rhythms.eighths) cells.push('eighths');
+                        if (rhythms.sixteenths) cells.push('sixteenths');
+                        if (rhythms.dotted) cells.push('dotted');
+                        if (rhythms.triplet) cells.push('triplet');
+                        if (rhythms.syncopation && remainingBeats >= 2.0) {
+                            cells.push('syncopation');
+                        }
+
+                        const cell = cells[Math.floor(Math.random() * cells.length)];
+
+                        if (cell === 'quarter') {
+                            currentScaleIdx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
+                            const pitch = pitchBank[currentScaleIdx];
+                            playbackNotes.push({
+                                note: pitch,
+                                time: timeAccumulator,
+                                duration: 1.0
+                            });
+                            measureAbc += midiToABCNote(pitch, key) + " ";
+                            timeAccumulator += 1.0;
+                            beatsInMeasure += 1.0;
+                        } else if (cell === 'eighths') {
+                            const p1Idx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
+                            const p1 = pitchBank[p1Idx];
+                            const p2Idx = chooseNextScaleIdx(p1Idx, pitchBank.length, leaps);
+                            const p2 = pitchBank[p2Idx];
+                            currentScaleIdx = p2Idx;
+
+                            playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.5 });
+                            playbackNotes.push({ note: p2, time: timeAccumulator + 0.5, duration: 0.5 });
+
+                            measureAbc += `${midiToABCNote(p1, key)}/2${midiToABCNote(p2, key)}/2 `;
+                            timeAccumulator += 1.0;
+                            beatsInMeasure += 1.0;
+                        } else if (cell === 'sixteenths') {
+                            const pitches = [];
+                            let tempIdx = currentScaleIdx;
+                            for (let j = 0; j < 4; j++) {
+                                tempIdx = chooseNextScaleIdx(tempIdx, pitchBank.length, leaps);
+                                pitches.push(pitchBank[tempIdx]);
+                            }
+                            currentScaleIdx = tempIdx;
+
+                            pitches.forEach((p, j) => {
+                                playbackNotes.push({ note: p, time: timeAccumulator + j * 0.25, duration: 0.25 });
+                            });
+
+                            measureAbc += `${midiToABCNote(pitches[0], key)}/4${midiToABCNote(pitches[1], key)}/4${midiToABCNote(pitches[2], key)}/4${midiToABCNote(pitches[3], key)}/4 `;
+                            timeAccumulator += 1.0;
+                            beatsInMeasure += 1.0;
+                        } else if (cell === 'dotted') {
+                            const p1Idx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
+                            const p1 = pitchBank[p1Idx];
+                            const p2Idx = chooseNextScaleIdx(p1Idx, pitchBank.length, leaps);
+                            const p2 = pitchBank[p2Idx];
+                            currentScaleIdx = p2Idx;
+
+                            playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.75 });
+                            playbackNotes.push({ note: p2, time: timeAccumulator + 0.75, duration: 0.25 });
+
+                            measureAbc += `${midiToABCNote(p1, key)}3/4${midiToABCNote(p2, key)}1/4 `;
+                            timeAccumulator += 1.0;
+                            beatsInMeasure += 1.0;
+                        } else if (cell === 'triplet') {
+                            const pitches = [];
+                            let tempIdx = currentScaleIdx;
+                            for (let j = 0; j < 3; j++) {
+                                tempIdx = chooseNextScaleIdx(tempIdx, pitchBank.length, leaps);
+                                pitches.push(pitchBank[tempIdx]);
+                            }
+                            currentScaleIdx = tempIdx;
+
+                            pitches.forEach((p, j) => {
+                                playbackNotes.push({ note: p, time: timeAccumulator + j * 0.333, duration: 0.333 });
+                            });
+
+                            measureAbc += `(3${midiToABCNote(pitches[0], key)}/2${midiToABCNote(pitches[1], key)}/2${midiToABCNote(pitches[2], key)}/2 `;
+                            timeAccumulator += 1.0;
+                            beatsInMeasure += 1.0;
+                        } else if (cell === 'syncopation') {
+                            const p1Idx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
+                            const p1 = pitchBank[p1Idx];
+                            const p2Idx = chooseNextScaleIdx(p1Idx, pitchBank.length, leaps);
+                            const p2 = pitchBank[p2Idx];
+                            const p3Idx = chooseNextScaleIdx(p2Idx, pitchBank.length, leaps);
+                            const p3 = pitchBank[p3Idx];
+                            currentScaleIdx = p3Idx;
+
+                            playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.5 });
+                            playbackNotes.push({ note: p2, time: timeAccumulator + 0.5, duration: 1.0 });
+                            playbackNotes.push({ note: p3, time: timeAccumulator + 1.5, duration: 0.5 });
+
+                            measureAbc += `${midiToABCNote(p1, key)}/2 ${midiToABCNote(p2, key)} ${midiToABCNote(p3, key)}/2 `;
+                            timeAccumulator += 2.0;
+                            beatsInMeasure += 2.0;
+                        }
+                    }
+                    abcBody += measureAbc + "| ";
+                }
+            }
+
+            return {
+                type: 'melodic',
+                key: key,
+                meter: meter,
+                beatsPerMeasure: beatsPerMeasure,
+                playbackNotes: playbackNotes,
+                abc: abcHeader + abcBody
+            };
+        }
+
+        function chooseNextScaleIdx(currIdx, length, leaps) {
+            const possibleOffsets = [];
+            possibleOffsets.push({ val: -1, weight: 60 });
+            possibleOffsets.push({ val: 1, weight: 60 });
+            possibleOffsets.push({ val: 0, weight: 15 });
+
+            if (leaps.third) {
+                possibleOffsets.push({ val: -2, weight: 30 });
+                possibleOffsets.push({ val: 2, weight: 30 });
+            }
+            if (leaps.fourthFifth) {
+                possibleOffsets.push({ val: -3, weight: 15 });
+                possibleOffsets.push({ val: 3, weight: 15 });
+                possibleOffsets.push({ val: -4, weight: 15 });
+                possibleOffsets.push({ val: 4, weight: 15 });
+            }
+            if (leaps.sixthSeventh) {
+                possibleOffsets.push({ val: -5, weight: 5 });
+                possibleOffsets.push({ val: 5, weight: 5 });
+                possibleOffsets.push({ val: -6, weight: 5 });
+                possibleOffsets.push({ val: 6, weight: 5 });
+            }
+            if (leaps.octave) {
+                possibleOffsets.push({ val: -7, weight: 5 });
+                possibleOffsets.push({ val: 7, weight: 5 });
+            }
+
+            let totalWeight = possibleOffsets.reduce((sum, item) => sum + item.weight, 0);
+            let rand = Math.random() * totalWeight;
+            let chosenOffset = 1;
+
+            for (let i = 0; i < possibleOffsets.length; i++) {
+                rand -= possibleOffsets[i].weight;
+                if (rand <= 0) {
+                    chosenOffset = possibleOffsets[i].val;
+                    break;
+                }
+            }
+
+            let newIdx = currIdx + chosenOffset;
+            if (newIdx < 4) newIdx = 4;
+            if (newIdx >= length - 4) newIdx = length - 5;
+            return newIdx;
+        }
+
+        // ================= ALGORITHMS: RHYTHM GENERATOR =================
+        function generateRhythmicDictationAlgo(meter, length, rhythms) {
+            let beatsPerMeasure = 2;
+            if (meter === '3/4') beatsPerMeasure = 3;
+            else if (meter === '4/4') beatsPerMeasure = 4;
+            else if (meter === '5/8') beatsPerMeasure = 2.5;
+            else if (meter === '7/8') beatsPerMeasure = 3.5;
+            else if (meter === '9/8') beatsPerMeasure = 4.5;
+            else if (meter === '11/8') beatsPerMeasure = 5.5;
+
+            const clicks = [];
+            let timeAccumulator = 0;
+            const isUneven = ['5/8', '7/8', '9/8', '11/8'].includes(meter);
+
+            let abcHeader = `X:1\nT:Ритмическа диктовка\nM:${meter}\nL:1/8\nK:C clef=perc\n`;
+            if (!isUneven) {
+                abcHeader = `X:1\nT:Ритмическа диктовка\nM:${meter}\nL:1/4\nK:C clef=perc\n`;
+            }
+
+            let abcBody = "";
+
+            if (isUneven) {
+                let groupings = [2, 3];
+                if (meter === '7/8') groupings = [3, 2, 2];
+                else if (meter === '9/8') groupings = [2, 2, 2, 3];
+                else if (meter === '11/8') groupings = [3, 2, 2, 2, 2];
+
+                for (let m = 0; m < length; m++) {
+                    let measureStr = "";
+                    groupings.forEach((group, gIdx) => {
+                        let filled = 0;
+                        while (filled < group) {
+                            let clickDur = 1; // eighth
+                            if (group - filled >= 2 && rhythms.quarter && Math.random() > 0.5) {
+                                clickDur = 2; // quarter
+                            }
+                            
+                            clicks.push({
+                                time: timeAccumulator,
+                                accent: filled === 0
+                            });
+
+                            measureStr += clickDur === 2 ? "C2" : "C";
+                            timeAccumulator += clickDur * 0.5;
+                            filled += clickDur;
+                        }
+                        measureStr += " ";
+                    });
+                    abcBody += measureStr + "| ";
+                }
+            } else {
+                for (let m = 0; m < length; m++) {
+                    let measureStr = "";
+                    let beatsFilled = 0;
+
+                    while (beatsFilled < beatsPerMeasure) {
+                        let cells = ['quarter'];
+                        if (rhythms.eighths) cells.push('eighths');
+                        if (rhythms.sixteenths) cells.push('sixteenths');
+                        if (rhythms.dotted) cells.push('dotted');
+                        if (rhythms.triplet) cells.push('triplet');
+                        if (rhythms.syncopation && beatsPerMeasure - beatsFilled >= 2.0) {
+                            cells.push('syncopation');
+                        }
+
+                        const cell = cells[Math.floor(Math.random() * cells.length)];
+
+                        if (cell === 'quarter') {
+                            clicks.push({ time: timeAccumulator, accent: beatsFilled === 0 });
+                            measureStr += "C ";
+                            timeAccumulator += 1.0;
+                            beatsFilled += 1.0;
+                        } else if (cell === 'eighths') {
+                            clicks.push({ time: timeAccumulator, accent: beatsFilled === 0 });
+                            clicks.push({ time: timeAccumulator + 0.5, accent: false });
+                            measureStr += "C/2C/2 ";
+                            timeAccumulator += 1.0;
+                            beatsFilled += 1.0;
+                        } else if (cell === 'sixteenths') {
+                            for (let k = 0; k < 4; k++) {
+                                clicks.push({ time: timeAccumulator + k * 0.25, accent: beatsFilled === 0 && k === 0 });
+                            }
+                            measureStr += "C/4C/4C/4C/4 ";
+                            timeAccumulator += 1.0;
+                            beatsFilled += 1.0;
+                        } else if (cell === 'dotted') {
+                            clicks.push({ time: timeAccumulator, accent: beatsFilled === 0 });
+                            clicks.push({ time: timeAccumulator + 0.75, accent: false });
+                            measureStr += "C>3/4C1/4 ";
+                            timeAccumulator += 1.0;
+                            beatsFilled += 1.0;
+                        } else if (cell === 'triplet') {
+                            clicks.push({ time: timeAccumulator, accent: beatsFilled === 0 });
+                            clicks.push({ time: timeAccumulator + 0.333, accent: false });
+                            clicks.push({ time: timeAccumulator + 0.666, accent: false });
+                            measureStr += "(3CCC ";
+                            timeAccumulator += 1.0;
+                            beatsFilled += 1.0;
+                        } else if (cell === 'syncopation') {
+                            clicks.push({ time: timeAccumulator, accent: beatsFilled === 0 });
+                            clicks.push({ time: timeAccumulator + 0.5, accent: true });
+                            clicks.push({ time: timeAccumulator + 1.5, accent: false });
+                            measureStr += "C/2C C/2 ";
+                            timeAccumulator += 2.0;
+                            beatsFilled += 2.0;
+                        }
+                    }
+                    abcBody += measureStr + "| ";
+                }
+            }
+
+            return {
+                type: 'rhythmic',
+                meter: meter,
+                beatsPerMeasure: beatsPerMeasure,
+                playbackClicks: clicks,
+                abc: abcHeader + abcBody
+            };
+        }
+
+        // Convert MIDI note number to ABC Notation format
+        function midiToABCNote(midi, key = 'C') {
+            const noteNames = ["C", "^C", "D", "^D", "E", "F", "^F", "G", "^G", "A", "^A", "B"];
+            const index = midi % 12;
+            const octave = Math.floor(midi / 12) - 1;
+
+            let name = noteNames[index];
+            if (['F', 'Bb', 'Eb', 'Gm', 'Dm'].includes(key)) {
+                const flatNoteNames = ["C", "_D", "D", "_E", "E", "F", "_G", "G", "_A", "A", "_B", "B"];
+                name = flatNoteNames[index];
+            }
+
+            if (octave === 3) return name + ",";
+            else if (octave === 4) return name;
+            else if (octave === 5) return name.toLowerCase();
+            else if (octave === 6) return name.toLowerCase() + "'";
+            return name;
+        }
+
+        // ================= INTERACTIVE CONTROLS =================
+        function playCurrentDictation() {
+            stopAudio();
+            if (!currentDictation) return;
+
+            const synth = document.getElementById('dict-synth').value;
+            const tempo = parseInt(document.getElementById('dict-tempo-val').value) || 80;
+            const beatDuration = 60 / tempo;
+            const now = audioCtx ? audioCtx.currentTime : 0.1;
+
+            let startTime = now + 0.2;
+
+            // Metronome Count-in
+            if (document.getElementById('dict-metronome-click').checked) {
+                const countBeats = Math.ceil(currentDictation.beatsPerMeasure);
+                for (let i = 0; i < countBeats; i++) {
+                    playClick(startTime + i * beatDuration, 1000);
+                }
+                startTime += countBeats * beatDuration;
+            }
+
+            if (currentDictation.type === 'melodic') {
+                currentDictation.playbackNotes.forEach(item => {
+                    const noteTime = startTime + item.time * beatDuration;
+                    const noteDur = item.duration * beatDuration;
+                    playTone(item.note, noteDur, noteTime, synth);
+                });
+            } else {
+                currentDictation.playbackClicks.forEach(item => {
+                    const clickTime = startTime + item.time * beatDuration;
+                    playClick(clickTime, item.accent ? 1100 : 700);
+                });
+            }
+        }
+
+        function playTuning() {
+            stopAudio();
+            if (!currentDictation || currentDictation.type !== 'melodic') return;
+
+            const key = currentDictation.key;
+            const baseNote = KEY_TONICS[key] || 60;
+            const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
+            const synth = document.getElementById('dict-synth').value;
+
+            const now = audioCtx ? audioCtx.currentTime : 0.1;
+
+            // Play I - IV - V - I cadence
+            // Chord progressions:
+            // 1. Tonic: C E G (0, 4, 7)
+            // 2. Subdominant: C F A (0, 5, 9)
+            // 3. Dominant: B D G (-1, 2, 7)
+            // 4. Tonic: C E G (0, 4, 7)
+            
+            const chordIntervals = [
+                [0, 4, 7],   // I
+                [0, 5, 9],   // IV
+                [-1, 2, 7],  // V (inversions)
+                [0, 4, 7]    // I
+            ];
+
+            chordIntervals.forEach((chord, stepIdx) => {
+                const chordTime = now + stepIdx * 0.8;
+                chord.forEach(interval => {
+                    // Approximate scale mapping
+                    playTone(baseNote + interval, 0.7, chordTime, synth);
+                });
+            });
+        }
+
+        function renderNotation(elementId, abc) {
+            if (typeof ABCJS !== 'undefined') {
+                try {
+                    ABCJS.renderAbc(elementId, abc, { responsive: 'resize' });
+                } catch(e) {
+                    console.error("ABCJS render error:", e);
+                }
+            } else {
+                const el = document.getElementById(elementId);
+                if (el) {
+                    el.innerHTML = "<p class='text-slate-500 text-xs text-center p-4'>⚠️ Зарежда се нотната библиотека (изисква се интернет връзка)... Звукът и контролите работят!</p>";
+                }
+            }
+        }
+
+        function renderEditedABC() {
+            const abc = document.getElementById('dictation-abc-editor').value;
+            renderNotation('dictation-notation-render', abc);
+        }
+
+        function toggleNotesVisibility() {
+            const container = document.getElementById('dictation-notation-container');
+            const btn = document.getElementById('btn-toggle-notes');
+            
+            if (isNotesVisible) {
+                container.classList.add('hidden');
+                btn.innerText = "👁️ Покажи Нотите";
+                isNotesVisible = false;
+            } else {
+                container.classList.remove('hidden');
+                btn.innerText = "👁️ Скрий Нотите (за ученици)";
+                isNotesVisible = true;
+            }
+        }
+
+        function copyABCCode() {
+            const text = document.getElementById('dictation-abc-editor').value;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("ABC кодът е копиран в клипборда! 📋");
+            });
+        }
+
+        // ================= CHAINS GENERATOR =================
+        function generateChain() {
+            stopAudio();
+            const type = document.getElementById('chain-type').value;
+            const baseNote = parseInt(document.getElementById('chain-base').value) || 60;
+            const steps = parseInt(document.getElementById('chain-steps-count').value) || 5;
+
+            const chainStepsDisplay = document.getElementById('chain-steps-display');
+            chainStepsDisplay.innerHTML = "";
+
+            if (type === 'interval') {
+                const grade = parseInt(document.getElementById('chains-grade').value) || 4;
+                let allowedIntervals = ['ч1', 'м2', 'г2', 'м3', 'г3', 'ч4', 'ч5', 'ч8'];
+                if (grade === 1) {
+                    allowedIntervals = ['ч1', 'г2', 'г3', 'ч5', 'ч8'];
+                } else if (grade === 2) {
+                    allowedIntervals = ['ч1', 'м2', 'г2', 'м3', 'г3', 'ч4', 'ч5', 'ч8'];
+                } else if (grade >= 4) {
+                    allowedIntervals = Object.keys(INTERVALS_DATA);
+                }
+                const intervalKeys = allowedIntervals;
+                
+                let currentPitch = baseNote;
+                const playbackNotes = [{ note: currentPitch, time: 0, duration: 0.8 }];
+                let abcBody = midiToABCNote(currentPitch) + " ";
+                let description = `Започни на тон <strong>${midiToBulgarianNoteName(currentPitch)}</strong>`;
+
+                for (let i = 0; i < steps; i++) {
+                    // Choose direction (up or down)
+                    const up = Math.random() > 0.4;
+                    const intervalKey = intervalKeys[Math.floor(Math.random() * (intervalKeys.length - 1)) + 1]; // skip unison
+                    const interval = INTERVALS_DATA[intervalKey];
+
+                    let nextPitch = currentPitch + (up ? interval.semitones : -interval.semitones);
+                    
+                    // Keep pitch in vocal bounds
+                    if (nextPitch < 55) {
+                        nextPitch = currentPitch + interval.semitones;
+                    } else if (nextPitch > 80) {
+                        nextPitch = currentPitch - interval.semitones;
+                    }
+
+                    playbackNotes.push({
+                        note: nextPitch,
+                        time: (i + 1) * 1.0,
+                        duration: 0.8
+                    });
+
+                    abcBody += midiToABCNote(nextPitch) + " ";
+                    description += ` ➔ ${up ? 'нагоре' : 'надолу'} <strong>${interval.name}</strong> (до тон ${midiToBulgarianNoteName(nextPitch)})`;
+                    currentPitch = nextPitch;
+                }
+
+                currentChain = {
+                    notes: playbackNotes,
+                    abc: `X:1\nT:Интервална верига\nM:C\nL:1/4\nK:C\n${abcBody} |]`
+                };
+
+                chainStepsDisplay.innerHTML = `<p>${description}.</p>`;
+                renderNotation('chain-notation-render', currentChain.abc);
+
+            } else {
+                // Chord Progression (I - IV - V - I)
+                const grade = parseInt(document.getElementById('chains-grade').value) || 4;
+                let cadences = [['T53', 'D53', 'T53']];
+                if (grade === 2) {
+                    cadences = [
+                        ['T53', 'D53', 'T53'],
+                        ['T53', 'S53', 'T53']
+                    ];
+                } else if (grade === 4) {
+                    cadences = [
+                        ['T53', 'S64', 'D53', 'T53'],
+                        ['T53', 'S6', 'D64', 'T53'],
+                        ['T53', 'S53', 'D53', 'T53']
+                    ];
+                } else {
+                    cadences = [
+                        ['T53', 'S64', 'D53', 'T53'],
+                        ['T53', 'S6', 'D64', 'T53'],
+                        ['T53', 'S64', 'D7', 'T53']
+                    ];
+                }
+                const cad = cadences[Math.floor(Math.random() * cadences.length)];
+
+                // C major default
+                const baseTonic = 60;
+                const chordsPlay = [];
+                let abcNotes = "";
+                let description = "Каданс: ";
+
+                cad.forEach((cName, idx) => {
+                    let semitones = [0, 4, 7]; // I
+                    if (cName === 'S64') semitones = [0, 5, 9]; // IV (C-F-A)
+                    else if (cName === 'S6') semitones = [0, 3, 8]; // IV sext (E-A-c)
+                    else if (cName === 'D53') semitones = [-1, 2, 7]; // V (B-D-G)
+                    else if (cName === 'D64') semitones = [2, 5, 11]; // V quart (D-G-B)
+                    else if (cName === 'D7') semitones = [-1, 2, 5, 7]; // V7 (B-D-F-G)
+
+                    const pitches = semitones.map(s => baseTonic + s);
+                    
+                    chordsPlay.push({
+                        pitches: pitches,
+                        time: idx * 1.2
+                    });
+
+                    description += `<strong>${cName}</strong> ` + (idx < cad.length - 1 ? '➔ ' : '');
+                    abcNotes += `[${pitches.map(p => midiToABCNote(p)).join('')}] `;
+                });
+
+                currentChain = {
+                    type: 'chord-prog',
+                    chords: chordsPlay,
+                    abc: `X:1\nT:Акордова последователност\nM:C\nL:1/2\nK:C\n${abcNotes} |]`
+                };
+
+                chainStepsDisplay.innerHTML = `<p>${description}</p>`;
+                renderNotation('chain-notation-render', currentChain.abc);
+            }
+
+            document.getElementById('chain-meta-text').innerText = `Генерирана верига (${type === 'interval' ? 'интервална' : 'акордова'})`;
+        }
+
+        function midiToBulgarianNoteName(midi) {
+            const noteNames = ["До", "До#", "Ре", "Миb", "Ми", "Фа", "Фа#", "Сол", "Сол#", "Ла", "Сиb", "Си"];
+            const index = midi % 12;
+            const octaves = ["субконтра", "контра", "голяма", "малка", "първа", "втора", "трета"];
+            const octaveIdx = Math.floor(midi / 12) - 1;
+            return `${noteNames[index]} (${octaves[octaveIdx]} окт.)`;
+        }
+
+        function playCurrentChain() {
+            stopAudio();
+            if (!currentChain) return;
+
+            const now = audioCtx ? audioCtx.currentTime : 0.1;
+
+            if (currentChain.notes) {
+                currentChain.notes.forEach(item => {
+                    playTone(item.note, item.duration, now + item.time, 'piano');
+                });
+            } else if (currentChain.chords) {
+                currentChain.chords.forEach(c => {
+                    c.pitches.forEach(pitch => {
+                        playTone(pitch, 1.0, now + c.time, 'piano');
+                    });
+                });
+            }
+        }
+
+        // ================= BUILDER =================
+        function updateBuilderElements() {
+            const type = document.getElementById('builder-type').value;
+            const elSelect = document.getElementById('builder-element');
+            const grade = parseInt(document.getElementById('builder-grade').value) || 4;
+            elSelect.innerHTML = "";
+
+            if (type === 'interval') {
+                let allowed = Object.keys(INTERVALS_DATA);
+                if (grade === 1) {
+                    allowed = ['ч1', 'г2', 'г3', 'ч5', 'ч8'];
+                } else if (grade === 2) {
+                    allowed = ['ч1', 'м2', 'г2', 'м3', 'г3', 'ч4', 'ч5', 'ч8'];
+                } else if (grade === 4) {
+                    allowed = ['ч1', 'м2', 'г2', 'м3', 'г3', 'ч4', 'тритонус', 'ч5', 'м6', 'г6', 'ч8'];
+                }
+                
+                allowed.forEach(key => {
+                    if (INTERVALS_DATA[key]) {
+                        const opt = document.createElement('option');
+                        opt.value = key;
+                        opt.innerText = INTERVALS_DATA[key].name;
+                        elSelect.appendChild(opt);
+                    }
+                });
+            } else {
+                let allowed = Object.keys(CHORDS_DATA);
+                if (grade === 1) {
+                    allowed = ['Б53'];
+                } else if (grade === 2) {
+                    allowed = ['Б53', 'М53'];
+                } else if (grade === 4) {
+                    allowed = ['Б53', 'М53', 'Б6', 'М6', 'Б64', 'М64'];
+                }
+                
+                allowed.forEach(key => {
+                    if (CHORDS_DATA[key]) {
+                        const opt = document.createElement('option');
+                        opt.value = key;
+                        opt.innerText = CHORDS_DATA[key].name;
+                        elSelect.appendChild(opt);
+                    }
+                });
+            }
+        }
+
+        function buildElement() {
+            const type = document.getElementById('builder-type').value;
+            const key = document.getElementById('builder-element').value;
+            const basePitch = parseInt(document.getElementById('builder-base-pitch').value) || 60;
+            const playMode = document.getElementById('builder-play-mode').value;
+
+            if (!key) {
+                document.getElementById('builder-meta-text').innerText = "Моля изберете елемент";
+                return;
+            }
+
+            let abc = `X:1\nT:Построен елемент\nM:C\nL:1/4\nK:C\n`;
+            let playNotes = [];
+
+            if (type === 'interval') {
+                const interval = INTERVALS_DATA[key];
+                if (!interval) return;
+                const target = basePitch + (playMode === 'down' ? -interval.semitones : interval.semitones);
+
+                abc += `${midiToABCNote(basePitch)} ${midiToABCNote(target)} | [${midiToABCNote(basePitch)}${midiToABCNote(target)}] |]`;
+                
+                if (playMode === 'up') {
+                    playNotes.push({ note: basePitch, time: 0, duration: 0.8 });
+                    playNotes.push({ note: target, time: 0.8, duration: 1.2 });
+                } else if (playMode === 'down') {
+                    playNotes.push({ note: target, time: 0, duration: 0.8 });
+                    playNotes.push({ note: basePitch, time: 0.8, duration: 1.2 });
+                } else {
+                    playNotes.push({ note: basePitch, time: 0, duration: 1.5 });
+                    playNotes.push({ note: target, time: 0, duration: 1.5 });
+                }
+            } else {
+                const chord = CHORDS_DATA[key];
+                if (!chord) return;
+                const pitches = chord.semitones.map(s => basePitch + (playMode === 'down' ? -s : s));
+                
+                abc += `[${pitches.map(p => midiToABCNote(p)).join('')}] |]`;
+
+                if (playMode === 'harmonic') {
+                    pitches.forEach(p => {
+                        playNotes.push({ note: p, time: 0, duration: 1.8 });
+                    });
+                } else {
+                    pitches.forEach((p, idx) => {
+                        playNotes.push({ note: p, time: idx * 0.4, duration: 0.8 });
+                    });
+                    pitches.forEach((p) => {
+                        playNotes.push({ note: p, time: pitches.length * 0.4 + 0.4, duration: 1.5 });
+                    });
+                }
+            }
+
+            currentBuilderElement = {
+                notes: playNotes,
+                abc: abc
+            };
+
+            document.getElementById('builder-meta-text').innerText = `Построен: ${type === 'interval' ? 'интервал' : 'акорд'}`;
+            renderNotation('builder-notation-render', abc);
+            playBuilderElement();
+        }
+
+        function playBuilderElement() {
+            stopAudio();
+            if (!currentBuilderElement) return;
+
+            const now = audioCtx ? audioCtx.currentTime : 0.1;
+            currentBuilderElement.notes.forEach(item => {
+                playTone(item.note, item.duration, now + item.time, 'piano');
+            });
+        }
+
+        // ================= INTONATION & SIGHT SINGING =================
+        function generateSingingTask() {
+            stopAudio();
+            const task = document.getElementById('singing-task').value;
+            const key = document.getElementById('singing-key').value;
+
+            const cardText = document.getElementById('singing-card-text');
+            const notationContainer = document.getElementById('singing-notation-container');
+
+            if (task === 'sight-singing') {
+                cardText.classList.add('hidden');
+                notationContainer.classList.remove('hidden');
+
+                const grade = parseInt(document.getElementById('singing-grade').value) || 4;
+
+                let configLeaps, configRhythms, meter;
+                if (grade === 1) {
+                    configLeaps = { step: true, third: false, fourthFifth: false, sixthSeventh: false, octave: false };
+                    configRhythms = { eighths: false, sixteenths: false, dotted: false, syncopation: false, triplet: false };
+                    meter = '2/4';
+                } else if (grade === 2) {
+                    configLeaps = { step: true, third: true, fourthFifth: false, sixthSeventh: false, octave: false };
+                    configRhythms = { eighths: true, sixteenths: false, dotted: false, syncopation: false, triplet: false };
+                    meter = '2/4';
+                } else if (grade === 4) {
+                    configLeaps = { step: true, third: true, fourthFifth: true, sixthSeventh: false, octave: false };
+                    configRhythms = { eighths: true, sixteenths: false, dotted: true, syncopation: false, triplet: false };
+                    meter = '3/4';
+                } else if (grade === 6) {
+                    configLeaps = { step: true, third: true, fourthFifth: true, sixthSeventh: true, octave: false };
+                    configRhythms = { eighths: true, sixteenths: true, dotted: true, syncopation: true, triplet: false };
+                    meter = '4/4';
+                } else {
+                    configLeaps = { step: true, third: true, fourthFifth: true, sixthSeventh: true, octave: true };
+                    configRhythms = { eighths: true, sixteenths: true, dotted: true, syncopation: true, triplet: true };
+                    meter = '7/8';
+                }
+                
+                const dict = generateMelodicDictationAlgo(key, meter, 4, configLeaps, configRhythms);
+                currentSingingTask = dict;
+
+                document.getElementById('singing-meta-text').innerText = `Мелодия за пеене (a prima vista) в ${translateKeyToBG(key)}`;
+                renderNotation('singing-notation-render', dict.abc);
+
+            } else {
+                cardText.classList.remove('hidden');
+                notationContainer.classList.add('hidden');
+
+                const baseTonic = KEY_TONICS[key] || 60;
+                const grade = parseInt(document.getElementById('singing-grade').value) || 4;
+
+                let allowedIntervals = ['ч1', 'г2', 'г3', 'ч5', 'ч8'];
+                if (grade === 2) {
+                    allowedIntervals = ['ч1', 'м2', 'г2', 'м3', 'г3', 'ч4', 'ч5', 'ч8'];
+                } else if (grade >= 4) {
+                    allowedIntervals = ['м2', 'г2', 'м3', 'г3', 'ч4', 'тритонус', 'ч5', 'м6', 'г6', 'м7', 'г7', 'ч8'];
+                }
+
+                const randomInt = allowedIntervals[Math.floor(Math.random() * allowedIntervals.length)];
+                const intObj = INTERVALS_DATA[randomInt];
+                if (!intObj) return;
+                
+                const direction = Math.random() > 0.4 ? 'нагоре' : 'надолу';
+                const noteName = midiToBulgarianNoteName(baseTonic);
+
+                cardText.innerHTML = `Изпей <strong>${intObj.name} ${direction}</strong> от изсвирения тон <strong>${noteName}</strong>!`;
+                
+                currentSingingTask = {
+                    type: 'card',
+                    baseNote: baseTonic,
+                    targetNote: baseTonic + (direction === 'нагоре' ? intObj.semitones : -intObj.semitones)
+                };
+
+                document.getElementById('singing-meta-text').innerText = `Интонационна карта`;
+            }
+        }
+
+        function playSingingReference() {
+            stopAudio();
+            if (!currentSingingTask) return;
+
+            const now = audioCtx ? audioCtx.currentTime : 0.1;
+
+            if (currentSingingTask.type === 'card') {
+                playTone(currentSingingTask.baseNote, 2.0, now, 'piano');
+            } else {
+                const key = currentSingingTask.key;
+                const baseNote = KEY_TONICS[key] || 60;
+                const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
+                
+                const chordSteps = [0, 2, 4, 7];
+                chordSteps.forEach((stepIdx, idx) => {
+                    playTone(baseNote + scale[stepIdx], 0.6, now + idx * 0.4, 'piano');
+                });
+            }
+        }
+
+        function playSingingFull() {
+            stopAudio();
+            if (!currentSingingTask) return;
+
+            const now = audioCtx ? audioCtx.currentTime : 0.1;
+
+            if (currentSingingTask.type === 'card') {
+                playTone(currentSingingTask.baseNote, 0.8, now, 'piano');
+                playTone(currentSingingTask.targetNote, 1.5, now + 1.0, 'piano');
+            } else {
+                const beatDuration = 60 / 80;
+                currentSingingTask.playbackNotes.forEach(item => {
+                    playTone(item.note, item.duration * beatDuration, now + item.time * beatDuration, 'piano');
+                });
+            }
+        }
+
+        // ================= CLASS GRADUATION DEFAULTS =================
+        function applyGradeDictationDefaults(grade) {
+            grade = parseInt(grade);
+            
+            if (grade === 1) {
+                document.getElementById('dict-meter').value = '2/4';
+                document.getElementById('dict-length').value = '4';
+                document.getElementById('dict-tempo-val').value = '80';
+                
+                document.getElementById('leap-3rd').checked = false;
+                document.getElementById('leap-4th-5th').checked = false;
+                document.getElementById('leap-6th-7th').checked = false;
+                document.getElementById('leap-8ve').checked = false;
+            } else if (grade === 2) {
+                document.getElementById('dict-meter').value = '2/4';
+                document.getElementById('dict-length').value = '4';
+                
+                document.getElementById('leap-3rd').checked = true;
+                document.getElementById('leap-4th-5th').checked = false;
+                document.getElementById('leap-6th-7th').checked = false;
+                document.getElementById('leap-8ve').checked = false;
+            } else if (grade === 3) {
+                document.getElementById('dict-meter').value = '3/4';
+                document.getElementById('dict-length').value = '4';
+                
+                document.getElementById('leap-3rd').checked = true;
+                document.getElementById('leap-4th-5th').checked = true;
+                document.getElementById('leap-6th-7th').checked = false;
+                document.getElementById('leap-8ve').checked = false;
+            } else if (grade === 4 || grade === 5) {
+                document.getElementById('dict-meter').value = '4/4';
+                document.getElementById('dict-length').value = '4';
+                
+                document.getElementById('leap-3rd').checked = true;
+                document.getElementById('leap-4th-5th').checked = true;
+                document.getElementById('leap-6th-7th').checked = false;
+                document.getElementById('leap-8ve').checked = false;
+            } else if (grade >= 6 && grade <= 7) {
+                document.getElementById('dict-meter').value = '7/8';
+                document.getElementById('dict-length').value = '4';
+                
+                document.getElementById('leap-3rd').checked = true;
+                document.getElementById('leap-4th-5th').checked = true;
+                document.getElementById('leap-6th-7th').checked = true;
+                document.getElementById('leap-8ve').checked = false;
+            } else {
+                document.getElementById('dict-meter').value = '7/8';
+                document.getElementById('dict-length').value = '8';
+                
+                document.getElementById('leap-3rd').checked = true;
+                document.getElementById('leap-4th-5th').checked = true;
+                document.getElementById('leap-6th-7th').checked = true;
+                document.getElementById('leap-8ve').checked = true;
+            }
+
+            updateRhythmicOptions();
+            
+            if (grade === 1) {
+                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = false;
+                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = false;
+                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = false;
+                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = false;
+                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = false;
+            } else if (grade === 2) {
+                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = true;
+                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = false;
+                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = false;
+                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = false;
+                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = false;
+            } else if (grade === 3) {
+                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = true;
+                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = false;
+                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = true;
+                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = false;
+                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = false;
+            } else if (grade === 4 || grade === 5) {
+                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = true;
+                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = true;
+                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = true;
+                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = false;
+                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = false;
+            } else {
+                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = true;
+                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = true;
+                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = true;
+                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = true;
+                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = true;
+            }
+        }
+
+        function applyGradeChainsDefaults(grade) {
+            grade = parseInt(grade);
+            const stepsInput = document.getElementById('chain-steps-count');
+            if (stepsInput) {
+                if (grade === 1) stepsInput.value = '3';
+                else if (grade === 2) stepsInput.value = '4';
+                else if (grade === 4) stepsInput.value = '5';
+                else if (grade === 6) stepsInput.value = '6';
+                else stepsInput.value = '8';
+            }
+        }
+    </script>
+</body>
+</html>
