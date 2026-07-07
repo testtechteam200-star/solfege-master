@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- abcjs CDN -->
     <script src="https://cdn.jsdelivr.net/npm/abcjs@6.3.0/dist/abcjs-basic-min.js"></script>
+    <!-- Soundfont-player for HQ sampled acoustic instruments -->
+    <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
     <style>
         body {
             font-family: 'Outfit', sans-serif;
@@ -576,18 +578,35 @@
 
     <!-- JS Logic -->
     <script>
-        // ================= AUDIO ENGINE (Web Audio API) =================
+        // ================= AUDIO ENGINE (Web Audio API & SoundFont Sampler) =================
         let audioCtx = null;
         let volumeNode = null;
         let activeTimeouts = []; // Keeps track of queued tones to clear them on stop
         let activeOscillators = []; // Keeps track of playing oscillators to stop them instantly
+        let sfPiano = null;
+        let sfLoading = false;
 
         function initAudio() {
             if (audioCtx) return;
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             volumeNode = audioCtx.createGain();
-            volumeNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            volumeNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
             volumeNode.connect(audioCtx.destination);
+
+            // Preload SoundFont for high-fidelity acoustic piano samples
+            if (window.Soundfont && !sfPiano && !sfLoading) {
+                sfLoading = true;
+                Soundfont.instrument(audioCtx, 'acoustic_grand_piano', { soundfont: 'FluidR3_GM' })
+                    .then(inst => {
+                        sfPiano = inst;
+                        sfLoading = false;
+                        console.log('🎹 HQ Acoustic Piano SoundFont loaded successfully!');
+                    })
+                    .catch(err => {
+                        sfLoading = false;
+                        console.warn('SoundFont load fallback to enhanced synth:', err);
+                    });
+            }
         }
 
         function stopAudio() {
@@ -596,13 +615,16 @@
             activeTimeouts = [];
 
             // Stop all active oscillators instantly
-            activeOscillators.forEach(osc => {
+            activeOscillators.forEach(node => {
                 try {
-                    osc.stop();
-                    osc.disconnect();
+                    if (node.stop) node.stop();
+                    node.disconnect();
                 } catch(e) {}
             });
             activeOscillators = [];
+            if (sfPiano && sfPiano.stop) {
+                try { sfPiano.stop(); } catch(e) {}
+            }
         }
 
         function midiToFreq(note) {
@@ -614,54 +636,106 @@
             const freq = midiToFreq(note);
             if (!freq || isNaN(freq)) return;
 
-            const osc = audioCtx.createOscillator();
-            const osc2 = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+            // Use sampled Steinway piano SoundFont if available
+            if (sfPiano && type === 'piano') {
+                try {
+                    sfPiano.play(note, startTime, { duration: duration, gain: 0.85 });
+                    return;
+                } catch(e) {
+                    console.warn("SoundFont play fallback:", e);
+                }
+            }
 
-            activeOscillators.push(osc);
-            activeOscillators.push(osc2);
-
+            // Enhanced Additive & Filtered Acoustic Piano Physical Modeling Synth
             if (type === 'piano') {
-                osc.type = 'triangle';
+                const osc1 = audioCtx.createOscillator(); // Fundamental
+                const osc2 = audioCtx.createOscillator(); // 2nd Harmonic
+                const osc3 = audioCtx.createOscillator(); // 3rd Harmonic
+
+                osc1.type = 'triangle';
+                osc1.frequency.setValueAtTime(freq, startTime);
+
                 osc2.type = 'sine';
                 osc2.frequency.setValueAtTime(freq * 2, startTime);
-                
-                gainNode.gain.setValueAtTime(0, startTime);
-                gainNode.gain.linearRampToValueAtTime(0.35, startTime + 0.015);
-                gainNode.gain.exponentialRampToValueAtTime(0.18, startTime + 0.12);
-                gainNode.gain.setValueAtTime(0.15, startTime + duration - 0.08);
+
+                osc3.type = 'sine';
+                osc3.frequency.setValueAtTime(freq * 3, startTime);
+
+                // Acoustic Filter Sweep
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(Math.min(freq * 6, 8000), startTime);
+                filter.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.5, 300), startTime + duration);
+
+                // Dynamic Envelope
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.001, startTime);
+                gainNode.gain.linearRampToValueAtTime(0.45, startTime + 0.012);
+                gainNode.gain.exponentialRampToValueAtTime(0.22, startTime + 0.15);
+                gainNode.gain.setValueAtTime(0.18, startTime + duration - 0.08);
                 gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-                
-                osc2.connect(gainNode);
+
+                osc1.connect(filter);
+                osc2.connect(filter);
+                osc3.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(volumeNode);
+
+                osc1.start(startTime);
                 osc2.start(startTime);
+                osc3.start(startTime);
+
+                osc1.stop(startTime + duration);
                 osc2.stop(startTime + duration);
+                osc3.stop(startTime + duration);
+
+                activeOscillators.push(osc1, osc2, osc3, gainNode, filter);
             } else if (type === 'bell') {
+                const osc = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
                 osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, startTime);
+
                 osc2.type = 'sine';
                 osc2.frequency.setValueAtTime(freq * 3, startTime);
-                
+
                 gainNode.gain.setValueAtTime(0, startTime);
                 gainNode.gain.linearRampToValueAtTime(0.55, startTime + 0.008);
                 gainNode.gain.exponentialRampToValueAtTime(0.04, startTime + 0.18);
                 gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-                
+
+                osc.connect(gainNode);
                 osc2.connect(gainNode);
+                gainNode.connect(volumeNode);
+
+                osc.start(startTime);
                 osc2.start(startTime);
+                osc.stop(startTime + duration);
                 osc2.stop(startTime + duration);
+
+                activeOscillators.push(osc, osc2);
             } else {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+
                 osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, startTime);
+
                 gainNode.gain.setValueAtTime(0, startTime);
                 gainNode.gain.linearRampToValueAtTime(0.25, startTime + 0.04);
                 gainNode.gain.setValueAtTime(0.25, startTime + duration - 0.04);
                 gainNode.gain.linearRampToValueAtTime(0.0001, startTime + duration);
+
+                osc.connect(gainNode);
+                gainNode.connect(volumeNode);
+
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+
+                activeOscillators.push(osc);
             }
-
-            osc.frequency.setValueAtTime(freq, startTime);
-            osc.connect(gainNode);
-            gainNode.connect(volumeNode);
-
-            osc.start(startTime);
-            osc.stop(startTime + duration);
         }
 
         function playClick(startTime, pitch = 700) {
@@ -738,6 +812,80 @@
             'Gm': [0, 2, 3, 5, 7, 8, 11, 12],
             'F#m': [0, 2, 3, 5, 7, 8, 11, 12]
         };
+
+        // ================= HARMONIC PROGRESSIONS =================
+        const CHORD_TONES = {
+            major: {
+                'I':   [0, 2, 4], // scale degrees 1, 3, 5
+                'ii':  [1, 3, 5],
+                'iii': [2, 4, 6],
+                'IV':  [3, 5, 0],
+                'V':   [4, 6, 1],
+                'vi':  [5, 0, 2],
+                'V7':  [4, 6, 1, 3]
+            },
+            minor: {
+                'i':   [0, 2, 4],
+                'ii0': [1, 3, 5],
+                'III': [2, 4, 6],
+                'iv':  [3, 5, 0],
+                'V':   [4, 6, 1],
+                'VI':  [5, 0, 2],
+                'V7':  [4, 6, 1, 3]
+            }
+        };
+
+        const PROGRESSIONS = {
+            major: {
+                4: [['I','IV','V','I'], ['I','V','IV','I'], ['I','ii','V','I']],
+                6: [['I','IV','I','V','V','I'], ['I','vi','IV','V','V','I'], ['I','ii','V','vi','IV','I']],
+                8: [['I','I','IV','IV','V','V','I','I'], ['I','V','vi','IV','I','IV','V','I'], ['I','iii','IV','V','vi','IV','V7','I']],
+                10: [['I','I','IV','ii','V','I','IV','V','V','I'], ['I','V','vi','vi','IV','I','ii','V','V','I']],
+                12: [['I','I','IV','IV','V','V','I','I','IV','ii','V','I'], ['I','V','vi','IV','I','iii','IV','ii','V','vi','V7','I']]
+            },
+            minor: {
+                4: [['i','iv','V','i'], ['i','V','iv','i'], ['i','ii0','V','i']],
+                6: [['i','iv','i','V','V','i'], ['i','VI','iv','V','V','i'], ['i','ii0','V','VI','iv','i']],
+                8: [['i','i','iv','iv','V','V','i','i'], ['i','V','VI','iv','i','iv','V','i'], ['i','III','iv','V','VI','iv','V7','i']],
+                10: [['i','i','iv','ii0','V','i','iv','V','V','i'], ['i','V','VI','VI','iv','i','ii0','V','V','i']],
+                12: [['i','i','iv','iv','V','V','i','i','iv','ii0','V','i'], ['i','V','VI','iv','i','III','iv','ii0','V','VI','V7','i']]
+            }
+        };
+
+        function getHarmonicProgression(key, numMeasures) {
+            const isMinor = key.includes('m');
+            const mode = isMinor ? 'minor' : 'major';
+            const available = PROGRESSIONS[mode];
+            // Find closest available length
+            const lengths = Object.keys(available).map(Number).sort((a,b) => a-b);
+            let bestLen = lengths[lengths.length - 1];
+            for (const l of lengths) {
+                if (l >= numMeasures) { bestLen = l; break; }
+            }
+            const progs = available[bestLen];
+            const chosen = progs[Math.floor(Math.random() * progs.length)];
+            // Trim or repeat to match numMeasures
+            const result = [];
+            for (let i = 0; i < numMeasures; i++) {
+                result.push(chosen[i % chosen.length]);
+            }
+            return result;
+        }
+
+        function isChordTone(scaleIdx, chordSymbol, key, pitchBank, tonic) {
+            const isMinor = key.includes('m');
+            const mode = isMinor ? 'minor' : 'major';
+            const chordDegrees = CHORD_TONES[mode][chordSymbol] || [0, 2, 4];
+            const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
+            const numDegrees = scale.length - 1; // exclude octave duplicate
+            // Get the scale degree of the current pitch
+            const pitch = pitchBank[scaleIdx];
+            const relPitch = ((pitch - tonic) % 12 + 12) % 12;
+            const degreeIdx = scale.indexOf(relPitch);
+            if (degreeIdx === -1) return false;
+            const degree = degreeIdx % numDegrees;
+            return chordDegrees.includes(degree);
+        }
 
         // ================= APP STATE =================
         let activeTab = 'dictation';
@@ -905,10 +1053,11 @@
             return translation[key] || key;
         }
 
-        // ================= ALGORITHMS: MELODY GENERATOR =================
+        // ================= ALGORITHMS: MUSICAL MELODY GENERATOR =================
         function generateMelodicDictationAlgo(key, meter, length, leaps, rhythms) {
             const tonic = KEY_TONICS[key] || 60;
             const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
+            const isMinor = key.includes('m');
             
             const pitchBank = [];
             for (let oct = -1; oct <= 1; oct++) {
@@ -917,9 +1066,14 @@
                 });
             }
             pitchBank.sort((a,b) => a-b);
+            // Remove duplicates
+            const uniquePitchBank = [...new Set(pitchBank)];
             
-            let currentScaleIdx = pitchBank.indexOf(tonic);
-            if (currentScaleIdx === -1) currentScaleIdx = Math.floor(pitchBank.length / 2);
+            let tonicIdx = uniquePitchBank.indexOf(tonic);
+            if (tonicIdx === -1) tonicIdx = Math.floor(uniquePitchBank.length / 2);
+
+            let currentScaleIdx = tonicIdx;
+            let lastStepDelta = 0;
 
             let beatsPerMeasure = 2;
             if (meter === '3/4') beatsPerMeasure = 3;
@@ -933,6 +1087,9 @@
             let timeAccumulator = 0;
             const isUneven = ['5/8', '7/8', '9/8', '11/8'].includes(meter);
 
+            // Get harmonic progression
+            const harmony = getHarmonicProgression(key, length);
+
             let abcHeader = `X:1\nT:Мелодическа диктовка\nM:${meter}\nL:1/8\nK:${key}\n`;
             if (!isUneven) {
                 abcHeader = `X:1\nT:Мелодическа диктовка\nM:${meter}\nL:1/4\nK:${key}\n`;
@@ -940,10 +1097,19 @@
 
             let abcBody = "";
 
+            // Motif storage: save first 2-beat pattern for reuse
+            let motifPitchOffsets = []; // offsets from first note of motif
+            let motifRhythmCells = [];
+            let motifCaptured = false;
+            let motifBaseIdx = tonicIdx;
+
             for (let m = 0; m < length; m++) {
                 let beatsInMeasure = 0;
                 const isLastMeasure = (m === length - 1);
+                const isClimaxMeasure = (m === Math.floor((length - 1) * 0.75));
+                const currentChord = harmony[m] || 'I';
                 let measureAbc = "";
+                let beatCounter = 0; // track beat position within measure
 
                 if (isUneven) {
                     let groupings = [2, 3];
@@ -960,15 +1126,22 @@
                             const isFinalGroupNote = isLastMeasure && (groupIdx === groupings.length - 1) && isLastNoteOfGroup;
 
                             if (isFinalGroupNote) {
-                                currentScaleIdx = pitchBank.indexOf(tonic);
+                                // Approach tonic: try to land on degree 2 or 7 before resolving
+                                currentScaleIdx = tonicIdx;
+                                lastStepDelta = 0;
                             } else {
-                                currentScaleIdx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
+                                const isStrong = (filled === 0);
+                                const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                                    chordSymbol: currentChord, key, pitchBank: uniquePitchBank, tonic, isStrongBeat: isStrong
+                                });
+                                lastStepDelta = nextInfo.idx - currentScaleIdx;
+                                currentScaleIdx = nextInfo.idx;
                             }
 
-                            const pitch = pitchBank[currentScaleIdx];
-                            let dur = 1; // 1 eighth
+                            const pitch = uniquePitchBank[currentScaleIdx];
+                            let dur = 1;
                             if (groupVal - filled >= 2 && rhythms.quarter && Math.random() > 0.5) {
-                                dur = 2; // quarter note
+                                dur = 2;
                             }
 
                             playbackNotes.push({
@@ -991,11 +1164,13 @@
                     while (beatsInMeasure < beatsPerMeasure) {
                         const remainingBeats = beatsPerMeasure - beatsInMeasure;
                         const isFinalBeat = (remainingBeats <= 1.0);
+                        const isStrongBeat = (beatCounter === 0 || (beatsPerMeasure === 4 && beatCounter === 2));
 
+                        // CADENTIAL RESOLUTION on last measure
                         if (isLastMeasure && isFinalBeat) {
-                            // Resolve to tonic
-                            currentScaleIdx = pitchBank.indexOf(tonic);
-                            const pitch = pitchBank[currentScaleIdx];
+                            // Approach: if we're not adjacent to tonic, step toward it first
+                            currentScaleIdx = tonicIdx;
+                            const pitch = uniquePitchBank[currentScaleIdx];
                             playbackNotes.push({
                                 note: pitch,
                                 time: timeAccumulator,
@@ -1018,21 +1193,111 @@
                             continue;
                         }
 
-                        // Choose a rhythmic cell
+                        // REST INSERTION: ~12% chance on weak beats (not first beat, not last measure)
+                        if (!isStrongBeat && !isLastMeasure && !isClimaxMeasure && Math.random() < 0.12) {
+                            playbackNotes.push({
+                                note: -1, // rest marker
+                                time: timeAccumulator,
+                                duration: 1.0
+                            });
+                            measureAbc += "z ";
+                            timeAccumulator += 1.0;
+                            beatsInMeasure += 1.0;
+                            beatCounter++;
+                            continue;
+                        }
+
+                        // MOTIF REUSE: On even-numbered measures (2, 4, 6...), if we have a motif,
+                        // there's a chance to replay it transposed
+                        let useMotif = false;
+                        if (motifCaptured && m > 0 && m % 2 === 0 && beatCounter === 0 && !isLastMeasure && Math.random() < 0.45) {
+                            useMotif = true;
+                        }
+
+                        if (useMotif && motifPitchOffsets.length > 0 && motifRhythmCells.length > 0) {
+                            // Replay motif transposed from current position
+                            const motifStartIdx = currentScaleIdx;
+                            let motifFits = true;
+                            let motifBeats = 0;
+                            // Check if motif fits in remaining beats
+                            for (const cell of motifRhythmCells) {
+                                if (cell === 'quarter') motifBeats += 1;
+                                else if (cell === 'eighths') motifBeats += 1;
+                                else if (cell === 'dotted') motifBeats += 1;
+                                else motifBeats += 1;
+                            }
+                            if (motifBeats > remainingBeats) motifFits = false;
+
+                            if (motifFits) {
+                                let pIdx = 0;
+                                for (let mc = 0; mc < motifRhythmCells.length && beatsInMeasure < beatsPerMeasure; mc++) {
+                                    const mCell = motifRhythmCells[mc];
+                                    if (mCell === 'quarter') {
+                                        const newIdx = Math.max(2, Math.min(uniquePitchBank.length - 3, motifStartIdx + (motifPitchOffsets[pIdx] || 0)));
+                                        currentScaleIdx = newIdx;
+                                        const pitch = uniquePitchBank[currentScaleIdx];
+                                        playbackNotes.push({ note: pitch, time: timeAccumulator, duration: 1.0 });
+                                        measureAbc += midiToABCNote(pitch, key) + " ";
+                                        timeAccumulator += 1.0;
+                                        beatsInMeasure += 1.0;
+                                        pIdx++;
+                                    } else if (mCell === 'eighths') {
+                                        for (let ei = 0; ei < 2; ei++) {
+                                            const newIdx = Math.max(2, Math.min(uniquePitchBank.length - 3, motifStartIdx + (motifPitchOffsets[pIdx] || 0)));
+                                            currentScaleIdx = newIdx;
+                                            const pitch = uniquePitchBank[currentScaleIdx];
+                                            playbackNotes.push({ note: pitch, time: timeAccumulator, duration: 0.5 });
+                                            measureAbc += midiToABCNote(pitch, key) + (ei === 0 ? "/2" : "/2 ");
+                                            timeAccumulator += 0.5;
+                                            pIdx++;
+                                        }
+                                        beatsInMeasure += 1.0;
+                                    } else {
+                                        // Default: quarter
+                                        const newIdx = Math.max(2, Math.min(uniquePitchBank.length - 3, motifStartIdx + (motifPitchOffsets[pIdx] || 0)));
+                                        currentScaleIdx = newIdx;
+                                        const pitch = uniquePitchBank[currentScaleIdx];
+                                        playbackNotes.push({ note: pitch, time: timeAccumulator, duration: 1.0 });
+                                        measureAbc += midiToABCNote(pitch, key) + " ";
+                                        timeAccumulator += 1.0;
+                                        beatsInMeasure += 1.0;
+                                        pIdx++;
+                                    }
+                                    beatCounter++;
+                                }
+                                lastStepDelta = 0;
+                                continue;
+                            }
+                        }
+
+                        // Choose rhythmic cell
                         let cells = ['quarter'];
                         if (rhythms.eighths) cells.push('eighths');
-                        if (rhythms.sixteenths) cells.push('sixteenths');
+                        if (rhythms.sixteenths && (isClimaxMeasure || Math.random() > 0.6)) cells.push('sixteenths');
                         if (rhythms.dotted) cells.push('dotted');
-                        if (rhythms.triplet) cells.push('triplet');
-                        if (rhythms.syncopation && remainingBeats >= 2.0) {
-                            cells.push('syncopation');
-                        }
+                        if (rhythms.triplet && isClimaxMeasure) cells.push('triplet');
+                        if (rhythms.syncopation && remainingBeats >= 2.0) cells.push('syncopation');
 
                         const cell = cells[Math.floor(Math.random() * cells.length)];
 
+                        // Capture motif from first measure
+                        if (m === 0 && !motifCaptured && beatCounter < 2) {
+                            motifRhythmCells.push(cell);
+                            motifBaseIdx = currentScaleIdx;
+                        }
+
+                        const chooseOpts = { chordSymbol: currentChord, key, pitchBank: uniquePitchBank, tonic, isStrongBeat };
+
                         if (cell === 'quarter') {
-                            currentScaleIdx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
-                            const pitch = pitchBank[currentScaleIdx];
+                            const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
+                            lastStepDelta = nextInfo.idx - currentScaleIdx;
+                            // Capture motif offset
+                            if (m === 0 && !motifCaptured) {
+                                motifPitchOffsets.push(nextInfo.idx - motifBaseIdx);
+                            }
+                            currentScaleIdx = nextInfo.idx;
+
+                            const pitch = uniquePitchBank[currentScaleIdx];
                             playbackNotes.push({
                                 note: pitch,
                                 time: timeAccumulator,
@@ -1042,11 +1307,16 @@
                             timeAccumulator += 1.0;
                             beatsInMeasure += 1.0;
                         } else if (cell === 'eighths') {
-                            const p1Idx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
-                            const p1 = pitchBank[p1Idx];
-                            const p2Idx = chooseNextScaleIdx(p1Idx, pitchBank.length, leaps);
-                            const p2 = pitchBank[p2Idx];
-                            currentScaleIdx = p2Idx;
+                            const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
+                            const delta1 = n1.idx - currentScaleIdx;
+                            const p1 = uniquePitchBank[n1.idx];
+                            if (m === 0 && !motifCaptured) motifPitchOffsets.push(n1.idx - motifBaseIdx);
+
+                            const n2 = chooseMusicalScaleIdx(n1.idx, tonicIdx, uniquePitchBank.length, leaps, m, length, delta1, { ...chooseOpts, isStrongBeat: false });
+                            lastStepDelta = n2.idx - n1.idx;
+                            const p2 = uniquePitchBank[n2.idx];
+                            currentScaleIdx = n2.idx;
+                            if (m === 0 && !motifCaptured) motifPitchOffsets.push(n2.idx - motifBaseIdx);
 
                             playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.5 });
                             playbackNotes.push({ note: p2, time: timeAccumulator + 0.5, duration: 0.5 });
@@ -1055,12 +1325,17 @@
                             timeAccumulator += 1.0;
                             beatsInMeasure += 1.0;
                         } else if (cell === 'sixteenths') {
-                            const pitches = [];
                             let tempIdx = currentScaleIdx;
+                            let tempDelta = lastStepDelta;
+                            const pitches = [];
+
                             for (let j = 0; j < 4; j++) {
-                                tempIdx = chooseNextScaleIdx(tempIdx, pitchBank.length, leaps);
-                                pitches.push(pitchBank[tempIdx]);
+                                const n = chooseMusicalScaleIdx(tempIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, tempDelta, { ...chooseOpts, isStrongBeat: j === 0 });
+                                tempDelta = n.idx - tempIdx;
+                                tempIdx = n.idx;
+                                pitches.push(uniquePitchBank[tempIdx]);
                             }
+                            lastStepDelta = tempDelta;
                             currentScaleIdx = tempIdx;
 
                             pitches.forEach((p, j) => {
@@ -1071,11 +1346,14 @@
                             timeAccumulator += 1.0;
                             beatsInMeasure += 1.0;
                         } else if (cell === 'dotted') {
-                            const p1Idx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
-                            const p1 = pitchBank[p1Idx];
-                            const p2Idx = chooseNextScaleIdx(p1Idx, pitchBank.length, leaps);
-                            const p2 = pitchBank[p2Idx];
-                            currentScaleIdx = p2Idx;
+                            const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
+                            const delta1 = n1.idx - currentScaleIdx;
+                            const p1 = uniquePitchBank[n1.idx];
+
+                            const n2 = chooseMusicalScaleIdx(n1.idx, tonicIdx, uniquePitchBank.length, leaps, m, length, delta1, { ...chooseOpts, isStrongBeat: false });
+                            lastStepDelta = n2.idx - n1.idx;
+                            const p2 = uniquePitchBank[n2.idx];
+                            currentScaleIdx = n2.idx;
 
                             playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.75 });
                             playbackNotes.push({ note: p2, time: timeAccumulator + 0.75, duration: 0.25 });
@@ -1084,12 +1362,17 @@
                             timeAccumulator += 1.0;
                             beatsInMeasure += 1.0;
                         } else if (cell === 'triplet') {
-                            const pitches = [];
                             let tempIdx = currentScaleIdx;
+                            let tempDelta = lastStepDelta;
+                            const pitches = [];
+
                             for (let j = 0; j < 3; j++) {
-                                tempIdx = chooseNextScaleIdx(tempIdx, pitchBank.length, leaps);
-                                pitches.push(pitchBank[tempIdx]);
+                                const n = chooseMusicalScaleIdx(tempIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, tempDelta, { ...chooseOpts, isStrongBeat: j === 0 });
+                                tempDelta = n.idx - tempIdx;
+                                tempIdx = n.idx;
+                                pitches.push(uniquePitchBank[tempIdx]);
                             }
+                            lastStepDelta = tempDelta;
                             currentScaleIdx = tempIdx;
 
                             pitches.forEach((p, j) => {
@@ -1100,13 +1383,18 @@
                             timeAccumulator += 1.0;
                             beatsInMeasure += 1.0;
                         } else if (cell === 'syncopation') {
-                            const p1Idx = chooseNextScaleIdx(currentScaleIdx, pitchBank.length, leaps);
-                            const p1 = pitchBank[p1Idx];
-                            const p2Idx = chooseNextScaleIdx(p1Idx, pitchBank.length, leaps);
-                            const p2 = pitchBank[p2Idx];
-                            const p3Idx = chooseNextScaleIdx(p2Idx, pitchBank.length, leaps);
-                            const p3 = pitchBank[p3Idx];
-                            currentScaleIdx = p3Idx;
+                            const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
+                            const delta1 = n1.idx - currentScaleIdx;
+                            const p1 = uniquePitchBank[n1.idx];
+
+                            const n2 = chooseMusicalScaleIdx(n1.idx, tonicIdx, uniquePitchBank.length, leaps, m, length, delta1, { ...chooseOpts, isStrongBeat: false });
+                            const delta2 = n2.idx - n1.idx;
+                            const p2 = uniquePitchBank[n2.idx];
+
+                            const n3 = chooseMusicalScaleIdx(n2.idx, tonicIdx, uniquePitchBank.length, leaps, m, length, delta2, { ...chooseOpts, isStrongBeat: false });
+                            lastStepDelta = n3.idx - n2.idx;
+                            const p3 = uniquePitchBank[n3.idx];
+                            currentScaleIdx = n3.idx;
 
                             playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.5 });
                             playbackNotes.push({ note: p2, time: timeAccumulator + 0.5, duration: 1.0 });
@@ -1116,7 +1404,10 @@
                             timeAccumulator += 2.0;
                             beatsInMeasure += 2.0;
                         }
+                        beatCounter++;
                     }
+                    // Mark motif as captured after first measure
+                    if (m === 0) motifCaptured = true;
                     abcBody += measureAbc + "| ";
                 }
             }
@@ -1126,38 +1417,121 @@
                 key: key,
                 meter: meter,
                 beatsPerMeasure: beatsPerMeasure,
-                playbackNotes: playbackNotes,
+                playbackNotes: playbackNotes.filter(n => n.note !== -1), // Remove rest markers from playback
                 abc: abcHeader + abcBody
             };
         }
 
-        function chooseNextScaleIdx(currIdx, length, leaps) {
+        // ================= MUSICAL VOICE LEADING & CONTOUR CONTROLLER =================
+        function chooseMusicalScaleIdx(currIdx, tonicIdx, bankLength, leaps, measureIdx, totalMeasures, lastStepDelta, options = {}) {
+            const { chordSymbol, key, pitchBank, tonic, isStrongBeat, phrasePosition } = options;
+            const progressRatio = measureIdx / Math.max(1, totalMeasures - 1);
+            const isClimaxPhase = (progressRatio >= 0.5 && progressRatio <= 0.8);
+            const isCadencePhase = (progressRatio > 0.8);
+
             const possibleOffsets = [];
-            possibleOffsets.push({ val: -1, weight: 60 });
-            possibleOffsets.push({ val: 1, weight: 60 });
-            possibleOffsets.push({ val: 0, weight: 15 });
 
-            if (leaps.third) {
-                possibleOffsets.push({ val: -2, weight: 30 });
-                possibleOffsets.push({ val: 2, weight: 30 });
-            }
-            if (leaps.fourthFifth) {
-                possibleOffsets.push({ val: -3, weight: 15 });
-                possibleOffsets.push({ val: 3, weight: 15 });
-                possibleOffsets.push({ val: -4, weight: 15 });
-                possibleOffsets.push({ val: 4, weight: 15 });
-            }
-            if (leaps.sixthSeventh) {
-                possibleOffsets.push({ val: -5, weight: 5 });
-                possibleOffsets.push({ val: 5, weight: 5 });
-                possibleOffsets.push({ val: -6, weight: 5 });
-                possibleOffsets.push({ val: 6, weight: 5 });
-            }
-            if (leaps.octave) {
-                possibleOffsets.push({ val: -7, weight: 5 });
-                possibleOffsets.push({ val: 7, weight: 5 });
+            // 1. TENDENCY TONE RESOLUTION (7→1, 4→3)
+            if (pitchBank && tonic) {
+                const pitch = pitchBank[currIdx];
+                const relPitch = ((pitch - tonic) % 12 + 12) % 12;
+                const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
+                // Leading tone (degree 7) → resolve up to tonic
+                if (relPitch === 11 || (scale.includes(11) && relPitch === 11)) {
+                    possibleOffsets.push({ val: 1, weight: 150 });
+                    possibleOffsets.push({ val: -1, weight: 20 });
+                    return finalize(currIdx, possibleOffsets, bankLength);
+                }
+                // Scale degree 4 → tend to resolve down to 3
+                if (relPitch === 5) { // perfect 4th above tonic
+                    possibleOffsets.push({ val: -1, weight: 100 });
+                    possibleOffsets.push({ val: 1, weight: 40 });
+                    possibleOffsets.push({ val: 0, weight: 20 });
+                }
             }
 
+            // 2. LEAP COMPENSATION RULE
+            if (lastStepDelta >= 2) {
+                possibleOffsets.push({ val: -1, weight: 130 });
+                possibleOffsets.push({ val: -2, weight: 70 });
+                possibleOffsets.push({ val: 0, weight: 10 });
+            } else if (lastStepDelta <= -2) {
+                possibleOffsets.push({ val: 1, weight: 130 });
+                possibleOffsets.push({ val: 2, weight: 70 });
+                possibleOffsets.push({ val: 0, weight: 10 });
+            } else if (possibleOffsets.length === 0) {
+                // 3. STRONG BEAT → favor chord tones
+                if (isStrongBeat && chordSymbol && pitchBank && tonic) {
+                    // Try offsets -3 to +3 and heavily weight chord tones
+                    for (let off = -3; off <= 3; off++) {
+                        const testIdx = currIdx + off;
+                        if (testIdx < 2 || testIdx >= bankLength - 2) continue;
+                        const isChord = isChordTone(testIdx, chordSymbol, key, pitchBank, tonic);
+                        if (off === 0) {
+                            possibleOffsets.push({ val: off, weight: isChord ? 40 : 5 });
+                        } else if (Math.abs(off) === 1) {
+                            possibleOffsets.push({ val: off, weight: isChord ? 80 : 25 });
+                        } else if (Math.abs(off) === 2) {
+                            if (leaps.third) possibleOffsets.push({ val: off, weight: isChord ? 60 : 15 });
+                        } else if (Math.abs(off) === 3) {
+                            if (leaps.fourthFifth) possibleOffsets.push({ val: off, weight: isChord ? 40 : 8 });
+                        }
+                    }
+                } else {
+                    // 4. MELODIC CONTOUR DIRECTIVES
+                    if (measureIdx === 0) {
+                        const distFromTonic = currIdx - tonicIdx;
+                        if (distFromTonic > 2) possibleOffsets.push({ val: -1, weight: 80 });
+                        else if (distFromTonic < -1) possibleOffsets.push({ val: 1, weight: 80 });
+                        else {
+                            possibleOffsets.push({ val: 1, weight: 60 });
+                            possibleOffsets.push({ val: 2, weight: 40 });
+                            possibleOffsets.push({ val: -1, weight: 40 });
+                        }
+                    } else if (isClimaxPhase) {
+                        possibleOffsets.push({ val: 1, weight: 90 });
+                        possibleOffsets.push({ val: 2, weight: 60 });
+                        possibleOffsets.push({ val: -1, weight: 20 });
+                        if (leaps.third) possibleOffsets.push({ val: 2, weight: 40 });
+                        if (leaps.fourthFifth) possibleOffsets.push({ val: 3, weight: 30 });
+                    } else if (isCadencePhase) {
+                        const distFromTonic = currIdx - tonicIdx;
+                        if (distFromTonic > 0) {
+                            possibleOffsets.push({ val: -1, weight: 100 });
+                            possibleOffsets.push({ val: -2, weight: 50 });
+                        } else if (distFromTonic < 0) {
+                            possibleOffsets.push({ val: 1, weight: 100 });
+                            possibleOffsets.push({ val: 2, weight: 50 });
+                        } else {
+                            possibleOffsets.push({ val: 1, weight: 50 });
+                            possibleOffsets.push({ val: -1, weight: 50 });
+                        }
+                    } else {
+                        possibleOffsets.push({ val: 1, weight: 60 });
+                        possibleOffsets.push({ val: -1, weight: 50 });
+                        possibleOffsets.push({ val: 0, weight: 15 });
+                        if (leaps.third) {
+                            possibleOffsets.push({ val: 2, weight: 25 });
+                            possibleOffsets.push({ val: -2, weight: 20 });
+                        }
+                        if (leaps.fourthFifth) {
+                            possibleOffsets.push({ val: 3, weight: 15 });
+                            possibleOffsets.push({ val: -3, weight: 10 });
+                        }
+                    }
+                }
+            }
+
+            // Fallback if no offsets generated
+            if (possibleOffsets.length === 0) {
+                possibleOffsets.push({ val: 1, weight: 50 });
+                possibleOffsets.push({ val: -1, weight: 50 });
+            }
+
+            return finalize(currIdx, possibleOffsets, bankLength);
+        }
+
+        function finalize(currIdx, possibleOffsets, bankLength) {
             let totalWeight = possibleOffsets.reduce((sum, item) => sum + item.weight, 0);
             let rand = Math.random() * totalWeight;
             let chosenOffset = 1;
@@ -1170,10 +1544,11 @@
                 }
             }
 
-            let newIdx = currIdx + chosenOffset;
-            if (newIdx < 4) newIdx = 4;
-            if (newIdx >= length - 4) newIdx = length - 5;
-            return newIdx;
+            let nextIdx = currIdx + chosenOffset;
+            if (nextIdx < 2) nextIdx = 2;
+            if (nextIdx >= bankLength - 2) nextIdx = bankLength - 3;
+
+            return { idx: nextIdx };
         }
 
         // ================= ALGORITHMS: RHYTHM GENERATOR =================
@@ -1356,29 +1731,32 @@
 
             const key = currentDictation.key;
             const baseNote = KEY_TONICS[key] || 60;
-            const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
+            const isMinor = key.includes('m');
             const synth = document.getElementById('dict-synth').value;
 
             const now = audioCtx ? audioCtx.currentTime : 0.1;
 
-            // Play I - IV - V - I cadence
-            // Chord progressions:
-            // 1. Tonic: C E G (0, 4, 7)
-            // 2. Subdominant: C F A (0, 5, 9)
-            // 3. Dominant: B D G (-1, 2, 7)
-            // 4. Tonic: C E G (0, 4, 7)
-            
-            const chordIntervals = [
-                [0, 4, 7],   // I
-                [0, 5, 9],   // IV
-                [-1, 2, 7],  // V (inversions)
-                [0, 4, 7]    // I
-            ];
+            // I - IV - V - I cadence (adapted for major/minor)
+            let chordIntervals;
+            if (isMinor) {
+                chordIntervals = [
+                    [0, 3, 7],   // i (minor)
+                    [0, 5, 8],   // iv (minor, root position approx)
+                    [-1, 2, 7],  // V (major - dominant is always major in minor keys)
+                    [0, 3, 7]    // i (minor)
+                ];
+            } else {
+                chordIntervals = [
+                    [0, 4, 7],   // I (major)
+                    [0, 5, 9],   // IV (major)
+                    [-1, 2, 7],  // V (major)
+                    [0, 4, 7]    // I (major)
+                ];
+            }
 
             chordIntervals.forEach((chord, stepIdx) => {
                 const chordTime = now + stepIdx * 0.8;
                 chord.forEach(interval => {
-                    // Approximate scale mapping
                     playTone(baseNote + interval, 0.7, chordTime, synth);
                 });
             });
