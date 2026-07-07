@@ -144,7 +144,7 @@
                 <!-- Tonalities (only visible for melodic) -->
                 <div id="settings-key-wrapper" class="flex flex-col gap-1.5">
                     <label for="dict-key" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Тоналност</label>
-                    <select id="dict-key" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    <select id="dict-key" onchange="updateScaleTypeOptions()" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
                         <option value="C" selected>До мажор (C major)</option>
                         <option value="Am">ла минор (A minor)</option>
                         <option value="G">Сол мажор (G major)</option>
@@ -157,6 +157,15 @@
                         <option value="Gm">сол минор (G minor)</option>
                         <option value="A">Ла мажор (A major)</option>
                         <option value="F#m">фа диез минор (F# minor)</option>
+                    </select>
+                </div>
+
+                <div id="settings-scale-type-wrapper" class="flex flex-col gap-1.5 mt-2">
+                    <label for="dict-scale-type" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Вид лад</label>
+                    <select id="dict-scale-type" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                        <option value="natural" selected>Натурален</option>
+                        <option value="harmonic">Хармоничен (понижена 6-та)</option>
+                        <option value="melodic">Мелодичен (понижена 6-та и 7-ма)</option>
                     </select>
                 </div>
 
@@ -855,6 +864,27 @@
         function getHarmonicProgression(key, numMeasures) {
             const isMinor = key.includes('m');
             const mode = isMinor ? 'minor' : 'major';
+            
+            // A-B-A-C Phrase Structure (Музикален синтаксис)
+            if (numMeasures === 4) {
+                return mode === 'major' ? ['I', 'V', 'I', 'I'] : ['i', 'V', 'i', 'i'];
+            }
+            if (numMeasures === 8) {
+                if (mode === 'major') {
+                    const choices = [
+                        ['I', 'IV', 'I', 'V', 'I', 'IV', 'V', 'I'],
+                        ['I', 'vi', 'ii', 'V', 'I', 'vi', 'V7', 'I']
+                    ];
+                    return choices[Math.floor(Math.random() * choices.length)];
+                } else {
+                    const choices = [
+                        ['i', 'iv', 'i', 'V', 'i', 'iv', 'V', 'i'],
+                        ['i', 'VI', 'ii0', 'V', 'i', 'VI', 'V7', 'i']
+                    ];
+                    return choices[Math.floor(Math.random() * choices.length)];
+                }
+            }
+
             const available = PROGRESSIONS[mode];
             // Find closest available length
             const lengths = Object.keys(available).map(Number).sort((a,b) => a-b);
@@ -876,15 +906,38 @@
             const isMinor = key.includes('m');
             const mode = isMinor ? 'minor' : 'major';
             const chordDegrees = CHORD_TONES[mode][chordSymbol] || [0, 2, 4];
-            const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
-            const numDegrees = scale.length - 1; // exclude octave duplicate
-            // Get the scale degree of the current pitch
-            const pitch = pitchBank[scaleIdx];
-            const relPitch = ((pitch - tonic) % 12 + 12) % 12;
-            const degreeIdx = scale.indexOf(relPitch);
-            if (degreeIdx === -1) return false;
-            const degree = degreeIdx % numDegrees;
+            
+            // pitchBank has exactly 7 unique pitches per octave.
+            // Index 0 is tonic (in the lowest octave generated).
+            const degree = scaleIdx % 7;
             return chordDegrees.includes(degree);
+        }
+
+        function updateScaleTypeOptions() {
+            const key = document.getElementById('dict-key').value;
+            const isMinor = key.includes('m');
+            const scaleSelect = document.getElementById('dict-scale-type');
+            if (!scaleSelect) return;
+            
+            const prevValue = scaleSelect.value;
+            scaleSelect.innerHTML = '';
+            
+            if (isMinor) {
+                scaleSelect.innerHTML += '<option value="natural">Натурален</option>';
+                scaleSelect.innerHTML += '<option value="harmonic">Хармоничен</option>';
+                scaleSelect.innerHTML += '<option value="melodic">Мелодичен</option>';
+                scaleSelect.innerHTML += '<option value="biharmonic">Бихармоничен (Двойно хармоничен)</option>';
+            } else {
+                scaleSelect.innerHTML += '<option value="natural">Натурален</option>';
+                scaleSelect.innerHTML += '<option value="harmonic">Хармоничен (понижена 6-та)</option>';
+                scaleSelect.innerHTML += '<option value="melodic">Мелодичен (понижена 6-та и 7-ма)</option>';
+            }
+            
+            if (Array.from(scaleSelect.options).some(opt => opt.value === prevValue)) {
+                scaleSelect.value = prevValue;
+            } else {
+                scaleSelect.value = isMinor ? 'harmonic' : 'natural';
+            }
         }
 
         // ================= APP STATE =================
@@ -899,6 +952,7 @@
         // ================= INIT =================
         window.addEventListener('load', () => {
             updateRhythmicOptions();
+            updateScaleTypeOptions();
             updateBuilderElements();
             generateDictation(); // Auto-generate first
         });
@@ -1009,6 +1063,8 @@
             const key = document.getElementById('dict-key').value;
             const meter = document.getElementById('dict-meter').value;
             const length = parseInt(document.getElementById('dict-length').value);
+            const scaleTypeNode = document.getElementById('dict-scale-type');
+            const scaleType = scaleTypeNode ? scaleTypeNode.value : 'natural';
             
             // Collect config
             const leaps = {
@@ -1032,7 +1088,7 @@
             }
 
             if (dictationType === 'melodic') {
-                currentDictation = generateMelodicDictationAlgo(key, meter, length, leaps, rhythms);
+                currentDictation = generateMelodicDictationAlgo(key, meter, length, leaps, rhythms, scaleType);
                 document.getElementById('output-meta-text').innerText = `Генерирана: ${translateKeyToBG(key)}, размер ${meter}, ${length} такта`;
             } else {
                 currentDictation = generateRhythmicDictationAlgo(meter, length, rhythms);
@@ -1054,10 +1110,27 @@
         }
 
         // ================= ALGORITHMS: MUSICAL MELODY GENERATOR =================
-        function generateMelodicDictationAlgo(key, meter, length, leaps, rhythms) {
+        function generateMelodicDictationAlgo(key, meter, length, leaps, rhythms, scaleType = 'natural') {
             const tonic = KEY_TONICS[key] || 60;
-            const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
             const isMinor = key.includes('m');
+            let scale = [];
+
+            if (isMinor) {
+                switch(scaleType) {
+                    case 'natural': scale = [0, 2, 3, 5, 7, 8, 10, 12]; break;
+                    case 'harmonic': scale = [0, 2, 3, 5, 7, 8, 11, 12]; break;
+                    case 'melodic': scale = [0, 2, 3, 5, 7, 9, 11, 12]; break;
+                    case 'biharmonic': scale = [0, 2, 3, 6, 7, 8, 11, 12]; break;
+                    default: scale = [0, 2, 3, 5, 7, 8, 11, 12]; // fallback harmonic
+                }
+            } else {
+                switch(scaleType) {
+                    case 'natural': scale = [0, 2, 4, 5, 7, 9, 11, 12]; break;
+                    case 'harmonic': scale = [0, 2, 4, 5, 7, 8, 11, 12]; break;
+                    case 'melodic': scale = [0, 2, 4, 5, 7, 8, 10, 12]; break;
+                    default: scale = [0, 2, 4, 5, 7, 9, 11, 12]; // fallback natural
+                }
+            }
             
             const pitchBank = [];
             for (let oct = -1; oct <= 1; oct++) {
@@ -1450,15 +1523,35 @@
                 }
             }
 
-            // 2. LEAP COMPENSATION RULE
+            // Strict Non-chord tone resolution: passing tones resolve by step to a chord tone on strong beats
+            if (isStrongBeat && chordSymbol && pitchBank && tonic) {
+                const isCurrChordTone = isChordTone(currIdx, chordSymbol, key, pitchBank, tonic);
+                if (!isCurrChordTone) {
+                    for (let off of [-1, 1]) {
+                        const testIdx = currIdx + off;
+                        if (testIdx >= 0 && testIdx < bankLength && isChordTone(testIdx, chordSymbol, key, pitchBank, tonic)) {
+                            possibleOffsets.push({ val: off, weight: 200 });
+                        }
+                    }
+                    if (possibleOffsets.length > 0) return finalize(currIdx, possibleOffsets, bankLength);
+                }
+            }
+
+            // 2. LEAP COMPENSATION & ARPEGGIATION RULE
             if (lastStepDelta >= 2) {
                 possibleOffsets.push({ val: -1, weight: 130 });
                 possibleOffsets.push({ val: -2, weight: 70 });
                 possibleOffsets.push({ val: 0, weight: 10 });
+                // Arpeggiation (Скрита полифония)
+                if (leaps.third) possibleOffsets.push({ val: 2, weight: 50 });
+                if (leaps.fourthFifth) possibleOffsets.push({ val: 3, weight: 30 });
             } else if (lastStepDelta <= -2) {
                 possibleOffsets.push({ val: 1, weight: 130 });
                 possibleOffsets.push({ val: 2, weight: 70 });
                 possibleOffsets.push({ val: 0, weight: 10 });
+                // Arpeggiation (Скрита полифония)
+                if (leaps.third) possibleOffsets.push({ val: -2, weight: 50 });
+                if (leaps.fourthFifth) possibleOffsets.push({ val: -3, weight: 30 });
             } else if (possibleOffsets.length === 0) {
                 // 3. STRONG BEAT → favor chord tones
                 if (isStrongBeat && chordSymbol && pitchBank && tonic) {
