@@ -931,6 +931,7 @@
                 scaleSelect.innerHTML += '<option value="natural">Натурален</option>';
                 scaleSelect.innerHTML += '<option value="harmonic">Хармоничен (понижена 6-та)</option>';
                 scaleSelect.innerHTML += '<option value="melodic">Мелодичен (понижена 6-та и 7-ма)</option>';
+                scaleSelect.innerHTML += '<option value="biharmonic">Бихармоничен (Двойно хармоничен)</option>';
             }
             
             if (Array.from(scaleSelect.options).some(opt => opt.value === prevValue)) {
@@ -1128,6 +1129,7 @@
                     case 'natural': scale = [0, 2, 4, 5, 7, 9, 11, 12]; break;
                     case 'harmonic': scale = [0, 2, 4, 5, 7, 8, 11, 12]; break;
                     case 'melodic': scale = [0, 2, 4, 5, 7, 8, 10, 12]; break;
+                    case 'biharmonic': scale = [0, 1, 4, 5, 7, 8, 11, 12]; break;
                     default: scale = [0, 2, 4, 5, 7, 9, 11, 12]; // fallback natural
                 }
             }
@@ -1542,16 +1544,30 @@
                 possibleOffsets.push({ val: -1, weight: 130 });
                 possibleOffsets.push({ val: -2, weight: 70 });
                 possibleOffsets.push({ val: 0, weight: 10 });
-                // Arpeggiation (Скрита полифония)
-                if (leaps.third) possibleOffsets.push({ val: 2, weight: 50 });
-                if (leaps.fourthFifth) possibleOffsets.push({ val: 3, weight: 30 });
+                // Arpeggiation (Скрита полифония) - Allow inversions (sextachord, quart-sextachord)
+                for (let off of [2, 3]) {
+                    if ((off === 2 && leaps.third) || (off === 3 && leaps.fourthFifth)) {
+                        const testIdx = currIdx + off;
+                        if (testIdx < bankLength) {
+                            const isCT = (chordSymbol && pitchBank && tonic) ? isChordTone(testIdx, chordSymbol, key, pitchBank, tonic) : false;
+                            possibleOffsets.push({ val: off, weight: isCT ? 90 : 10 });
+                        }
+                    }
+                }
             } else if (lastStepDelta <= -2) {
                 possibleOffsets.push({ val: 1, weight: 130 });
                 possibleOffsets.push({ val: 2, weight: 70 });
                 possibleOffsets.push({ val: 0, weight: 10 });
-                // Arpeggiation (Скрита полифония)
-                if (leaps.third) possibleOffsets.push({ val: -2, weight: 50 });
-                if (leaps.fourthFifth) possibleOffsets.push({ val: -3, weight: 30 });
+                // Arpeggiation (Скрита полифония) - Allow inversions (sextachord, quart-sextachord)
+                for (let off of [-2, -3]) {
+                    if ((off === -2 && leaps.third) || (off === -3 && leaps.fourthFifth)) {
+                        const testIdx = currIdx + off;
+                        if (testIdx >= 0) {
+                            const isCT = (chordSymbol && pitchBank && tonic) ? isChordTone(testIdx, chordSymbol, key, pitchBank, tonic) : false;
+                            possibleOffsets.push({ val: off, weight: isCT ? 90 : 10 });
+                        }
+                    }
+                }
             } else if (possibleOffsets.length === 0) {
                 // 3. STRONG BEAT → favor chord tones
                 if (isStrongBeat && chordSymbol && pitchBank && tonic) {
