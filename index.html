@@ -173,10 +173,15 @@
                 <div class="flex flex-col gap-1.5">
                     <label for="dict-meter" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Размер</label>
                     <select id="dict-meter" onchange="updateRhythmicOptions()" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                        <optgroup label="Равноделни">
+                        <optgroup label="Прости Равноделни">
                             <option value="2/4" selected>2/4</option>
                             <option value="3/4">3/4</option>
+                            <option value="3/8">3/8</option>
+                        </optgroup>
+                        <optgroup label="Сложни Равноделни">
                             <option value="4/4">4/4</option>
+                            <option value="6/8">6/8</option>
+                            <option value="12/8">12/8</option>
                         </optgroup>
                         <optgroup label="Неравноделни (Български фолклор)">
                             <option value="5/8">5/8 (2+3 - Пайдушко)</option>
@@ -303,7 +308,7 @@
                     </div>
 
                     <!-- Render Area -->
-                    <div id="dictation-notation-container" class="bg-white/95 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[160px]">
+                    <div id="dictation-notation-container" class="bg-white/95 text-slate-900 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[160px]">
                         <div id="dictation-notation-render" class="w-full"></div>
                     </div>
 
@@ -400,7 +405,7 @@
                     </div>
 
                     <!-- Render Area -->
-                    <div id="chain-notation-container" class="bg-white/95 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
+                    <div id="chain-notation-container" class="bg-white/95 text-slate-900 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
                         <div id="chain-notation-render" class="w-full"></div>
                     </div>
                 </div>
@@ -496,7 +501,7 @@
                     <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Нотна визуализация</span>
                     
                     <!-- Render Area -->
-                    <div id="builder-notation-container" class="bg-white/95 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
+                    <div id="builder-notation-container" class="bg-white/95 text-slate-900 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
                         <div id="builder-notation-render" class="w-full"></div>
                     </div>
                 </div>
@@ -576,8 +581,8 @@
                     </div>
 
                     <!-- Sight singing notation display -->
-                    <div id="singing-notation-container" class="bg-white/95 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
-                        <div id="singing-notation-render" class="w-full"></div>
+                    <div id="singing-notation-container" class="bg-white/95 text-slate-900 rounded-2xl p-5 border border-slate-200 flex justify-center items-center shadow-inner overflow-x-auto min-h-[140px]">
+                        <div id="singing-notation-render" class="w-full text-slate-900"></div>
                     </div>
                 </div>
             </div>
@@ -1005,7 +1010,7 @@
             const container = document.getElementById('rhythm-checkboxes');
             container.innerHTML = '';
 
-            const isUneven = ['5/8', '7/8', '9/8', '11/8'].includes(meter);
+            const isUneven = ['3/8', '6/8', '12/8', '5/8', '7/8', '9/8', '11/8'].includes(meter);
 
             if (isUneven) {
                 // Uneven meters are mostly subdivision based (eighths and quarters)
@@ -1153,6 +1158,9 @@
             let beatsPerMeasure = 2;
             if (meter === '3/4') beatsPerMeasure = 3;
             else if (meter === '4/4') beatsPerMeasure = 4;
+            else if (meter === '3/8') beatsPerMeasure = 1.5;
+            else if (meter === '6/8') beatsPerMeasure = 3;
+            else if (meter === '12/8') beatsPerMeasure = 6;
             else if (meter === '5/8') beatsPerMeasure = 2.5;
             else if (meter === '7/8') beatsPerMeasure = 3.5;
             else if (meter === '9/8') beatsPerMeasure = 4.5;
@@ -1160,7 +1168,7 @@
 
             const playbackNotes = [];
             let timeAccumulator = 0;
-            const isUneven = ['5/8', '7/8', '9/8', '11/8'].includes(meter);
+            const isUneven = ['3/8', '6/8', '12/8', '5/8', '7/8', '9/8', '11/8'].includes(meter);
 
             // Get harmonic progression
             const harmony = getHarmonicProgression(key, length);
@@ -1188,7 +1196,10 @@
 
                 if (isUneven) {
                     let groupings = [2, 3];
-                    if (meter === '7/8') groupings = [3, 2, 2];
+                    if (meter === '3/8') groupings = [3];
+                    else if (meter === '6/8') groupings = [3, 3];
+                    else if (meter === '12/8') groupings = [3, 3, 3, 3];
+                    else if (meter === '7/8') groupings = [3, 2, 2];
                     else if (meter === '9/8') groupings = [2, 2, 2, 3];
                     else if (meter === '11/8') groupings = [3, 2, 2, 2, 2];
 
@@ -1215,7 +1226,9 @@
 
                             const pitch = uniquePitchBank[currentScaleIdx];
                             let dur = 1;
-                            if (groupVal - filled >= 2 && rhythms.quarter && Math.random() > 0.5) {
+                            if (groupVal - filled >= 3 && rhythms.dotted && Math.random() > 0.6) {
+                                dur = 3;
+                            } else if (groupVal - filled >= 2 && rhythms.quarter && Math.random() > 0.5) {
                                 dur = 2;
                             }
 
@@ -1226,7 +1239,9 @@
                             });
 
                             const noteChar = midiToABCNote(pitch, key);
-                            groupAbc += dur === 2 ? `${noteChar}2` : noteChar;
+                            if (dur === 3) groupAbc += `${noteChar}3`;
+                            else if (dur === 2) groupAbc += `${noteChar}2`;
+                            else groupAbc += noteChar;
 
                             timeAccumulator += dur * 0.5;
                             filled += dur;
@@ -1672,7 +1687,7 @@
 
             const clicks = [];
             let timeAccumulator = 0;
-            const isUneven = ['5/8', '7/8', '9/8', '11/8'].includes(meter);
+            const isUneven = ['3/8', '6/8', '12/8', '5/8', '7/8', '9/8', '11/8'].includes(meter);
 
             let abcHeader = `X:1\nT:Ритмическа диктовка\nM:${meter}\nL:1/8\nK:C clef=perc\n`;
             if (!isUneven) {
@@ -1683,7 +1698,10 @@
 
             if (isUneven) {
                 let groupings = [2, 3];
-                if (meter === '7/8') groupings = [3, 2, 2];
+                if (meter === '3/8') groupings = [3];
+                else if (meter === '6/8') groupings = [3, 3];
+                else if (meter === '12/8') groupings = [3, 3, 3, 3];
+                else if (meter === '7/8') groupings = [3, 2, 2];
                 else if (meter === '9/8') groupings = [2, 2, 2, 3];
                 else if (meter === '11/8') groupings = [3, 2, 2, 2, 2];
 
@@ -1693,7 +1711,9 @@
                         let filled = 0;
                         while (filled < group) {
                             let clickDur = 1; // eighth
-                            if (group - filled >= 2 && rhythms.quarter && Math.random() > 0.5) {
+                            if (group - filled >= 3 && rhythms.dotted && Math.random() > 0.6) {
+                                clickDur = 3; // dotted quarter
+                            } else if (group - filled >= 2 && rhythms.quarter && Math.random() > 0.5) {
                                 clickDur = 2; // quarter
                             }
                             
@@ -1702,7 +1722,10 @@
                                 accent: filled === 0
                             });
 
-                            measureStr += clickDur === 2 ? "C2" : "C";
+                            if (clickDur === 3) measureStr += "C3";
+                            else if (clickDur === 2) measureStr += "C2";
+                            else measureStr += "C";
+                            
                             timeAccumulator += clickDur * 0.5;
                             filled += clickDur;
                         }
