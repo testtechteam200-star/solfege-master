@@ -1155,6 +1155,11 @@
 
             let currentScaleIdx = tonicIdx;
             let lastStepDelta = 0;
+            
+            let isVeryFirstNote = true;
+            const startDegreeOffsets = [0, 2, 4, 7];
+            const firstNoteOffset = startDegreeOffsets[Math.floor(Math.random() * startDegreeOffsets.length)];
+
 
             let beatsPerMeasure = 2;
             if (meter === '3/4') beatsPerMeasure = 3;
@@ -1218,9 +1223,14 @@
                                 lastStepDelta = 0;
                             } else {
                                 const isStrong = (filled === 0);
-                                const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                                const unevenOpts = {
                                     chordSymbol: currentChord, key, pitchBank: uniquePitchBank, tonic, isStrongBeat: isStrong
-                                });
+                                };
+                                if (isVeryFirstNote) {
+                                    unevenOpts.forceIdx = tonicIdx + firstNoteOffset;
+                                    isVeryFirstNote = false;
+                                }
+                                const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, unevenOpts);
                                 lastStepDelta = nextInfo.idx - currentScaleIdx;
                                 currentScaleIdx = nextInfo.idx;
                             }
@@ -1378,6 +1388,10 @@
                         }
 
                         const chooseOpts = { chordSymbol: currentChord, key, pitchBank: uniquePitchBank, tonic, isStrongBeat };
+                        if (isVeryFirstNote) {
+                            chooseOpts.forceIdx = tonicIdx + firstNoteOffset;
+                            isVeryFirstNote = false;
+                        }
 
                         if (cell === 'quarter') {
                             const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
@@ -1515,6 +1529,11 @@
 
         // ================= MUSICAL VOICE LEADING & CONTOUR CONTROLLER =================
         function chooseMusicalScaleIdx(currIdx, tonicIdx, bankLength, leaps, measureIdx, totalMeasures, lastStepDelta, options = {}) {
+            if (options.forceIdx !== undefined) {
+                const forced = options.forceIdx;
+                delete options.forceIdx;
+                return { idx: forced };
+            }
             const { chordSymbol, key, pitchBank, tonic, isStrongBeat, phrasePosition } = options;
             const progressRatio = measureIdx / Math.max(1, totalMeasures - 1);
             const isClimaxPhase = (progressRatio >= 0.5 && progressRatio <= 0.8);
