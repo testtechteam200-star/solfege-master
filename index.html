@@ -112,22 +112,45 @@
                     <p class="text-xs text-slate-400 mt-0.5">Персонализирай параметрите на генериране</p>
                 </div>
 
-                <!-- Grade Selector -->
+                <!-- School Profile & Grade Selector -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-1.5">
+                        <label for="dict-school-type" class="text-xs font-semibold text-purple-300 uppercase tracking-wide">Училищен профил</label>
+                        <select id="dict-school-type" onchange="applyGradeDictationDefaults(document.getElementById('dict-grade').value)" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-purple-500/40 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            <option value="general" selected>🏫 Общообразователно (СУ/ОУ)</option>
+                            <option value="music">🎼 Музикално училище (НМУ)</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label for="dict-grade" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Клас (1–12 кл.)</label>
+                        <select id="dict-grade" onchange="applyGradeDictationDefaults(this.value)" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            <option value="1">1 клас (Начално ниво)</option>
+                            <option value="2">2 клас (Основни стъпки)</option>
+                            <option value="3">3 клас (Терци и тризвучие)</option>
+                            <option value="4" selected>4 клас (Класически период)</option>
+                            <option value="5">5 клас (Кварти, квинти и S-D-T)</option>
+                            <option value="6">6 клас (Пунктиран ритъм & 7/8)</option>
+                            <option value="7">7 клас (Хармоничен лад & скокове)</option>
+                            <option value="8">8 клас (Синкопи & сексти)</option>
+                            <option value="9">9 клас (Триоли & мелодичен лад)</option>
+                            <option value="10">10 клас (Сложни & неравноделни)</option>
+                            <option value="11">11 клас (Бихармоничен & хроматика)</option>
+                            <option value="12">12 клас (Майсторски солфеж / ДЗИ)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Teacher Pedagogical Preset Selector -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="dict-grade" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Клас (Трудност)</label>
-                    <select id="dict-grade" onchange="applyGradeDictationDefaults(this.value)" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                        <option value="1">1 клас (Много лесно)</option>
-                        <option value="2">2 клас (Много лесно)</option>
-                        <option value="3">3 клас (Лесно)</option>
-                        <option value="4" selected>4 клас (Средно)</option>
-                        <option value="5">5 клас (Средно)</option>
-                        <option value="6">6 клас (Трудно)</option>
-                        <option value="7">7 клас (Трудно)</option>
-                        <option value="8">8 клас (Напреднали)</option>
-                        <option value="9">9 клас (Напреднали)</option>
-                        <option value="10">10 клас (Майстори)</option>
-                        <option value="11">11 клас (Майстори)</option>
-                        <option value="12">12 клас (Майстори)</option>
+                    <label for="dict-preset" class="text-xs font-semibold text-emerald-400 uppercase tracking-wide">👩‍🏫 Методическа задача (Д-р Елеонора)</label>
+                    <select id="dict-preset" onchange="if(this.value) applyPedagogicalPreset(this.value); else applyGradeDictationDefaults(document.getElementById('dict-grade').value);" class="bg-slate-800/90 text-emerald-200 rounded-xl px-3 py-2 border border-emerald-500/30 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <option value="" selected>✨ Автоматично по избрания клас (Класически период)</option>
+                        <option value="tonic_triad_steps">1. Тоническо тризвучие и постепенно движение (2/4)</option>
+                        <option value="enclosure_stable_degrees">2. Опеване на устойчивите степени I, III и V (2/4)</option>
+                        <option value="leaps_p4_p5_td">3. Скокове на ч4 и ч5: T - S - D - T (3/4)</option>
+                        <option value="dotted_and_sixteenths">4. Пунктиран ритъм и шестнадесетини в период (4/4)</option>
+                        <option value="melodic_minor_arpeggios">5. Мелодичен лад и разлагания S-D7-T (4/4)</option>
+                        <option value="bulgarian_asymmetric_rachenitsa">6. Български неравноделни размери: 7/8 Ръченица</option>
                     </select>
                 </div>
 
@@ -248,11 +271,15 @@
 
                 <!-- Synth Sound Selection -->
                 <div class="flex flex-col gap-1.5">
-                    <label for="dict-synth" class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Тембър на изсвирване</label>
-                    <select id="dict-synth" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-slate-700 text-sm focus:outline-none">
-                        <option value="piano">Пиано (меко)</option>
-                        <option value="bell">Металофон / Камбанки</option>
-                        <option value="sine">Чист тон (синусоида)</option>
+                    <label for="dict-synth" class="text-xs font-semibold text-amber-300 uppercase tracking-wide">🎻 Инструмент (Маестра Валерия HQ Audio)</label>
+                    <select id="dict-synth" onchange="preloadSelectedInstrument(this.value)" class="bg-slate-800 text-slate-100 rounded-xl px-3 py-2 border border-amber-500/40 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="piano" selected>🎹 Концертен Роял (Steinway Grand Piano)</option>
+                        <option value="violin">🎻 Соло Цигулка (Stradivarius Violin + Vibrato)</option>
+                        <option value="accordion">🪗 Концертен Акордеон (Balkan/Musette Accordion)</option>
+                        <option value="organ">⛪ Катедрален Орган (Pipe / Church Organ)</option>
+                        <option value="guitar">🎸 Класическа Китара (Acoustic Nylon Guitar)</option>
+                        <option value="bell">🔔 Металофон / Камбанки (Glockenspiel)</option>
+                        <option value="sine">〰️ Чист камертон (Sine Wave)</option>
                     </select>
                 </div>
 
@@ -266,43 +293,69 @@
             <div class="lg:col-span-7 flex flex-col gap-6">
                 <!-- Action Bar & Audio Players -->
                 <div class="glass rounded-3xl p-5 flex flex-col gap-4 shadow-xl">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
                         <div>
-                            <h3 class="text-md font-bold text-slate-100 uppercase tracking-wide">Контролен Панел</h3>
+                            <h3 class="text-md font-bold text-slate-100 uppercase tracking-wide">👩‍🏫 Учителски Контролен Панел</h3>
                             <span id="output-meta-text" class="text-xs text-indigo-400">Генерирана: До мажор, размер 2/4</span>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <!-- Accompaniment toggle -->
+                            <label class="flex items-center gap-1.5 text-xs text-amber-300 font-medium cursor-pointer">
+                                <input type="checkbox" id="dict-accompaniment" checked>
+                                <span>🎼 Със съпровод (лява ръка)</span>
+                            </label>
                             <!-- Metronome Click toggle -->
-                            <label class="flex items-center gap-1.5 text-xs text-slate-400 cursor-pointer">
+                            <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer">
                                 <input type="checkbox" id="dict-metronome-click" checked>
-                                <span>Метрономен предтакт</span>
+                                <span>⏱️ Предтакт</span>
                             </label>
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap gap-3">
-                        <button id="btn-play-tuning" onclick="playTuning()" class="glass-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
-                            🎹 Настройка (Каданс)
+                    <div class="flex flex-wrap gap-2.5">
+                        <button id="btn-play-tuning" onclick="playTuning()" class="glass-btn px-3.5 py-2.5 rounded-xl text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
+                            🎹 Настройка (T-S-D-T)
                         </button>
-                        <button id="btn-play-dict" onclick="playCurrentDictation()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
-                            ▶️ Изсвири диктовката
+                        <button id="btn-play-dict" onclick="playCurrentDictation()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
+                            ▶️ Изсвири цялата
                         </button>
-                        <button id="btn-stop-audio" onclick="stopAudio()" class="glass-btn px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center gap-1.5">
-                            ⏹️ Спри звука
+                        <button onclick="playPhraseHalf(1)" class="glass-btn px-3.5 py-2.5 rounded-xl text-xs font-semibold text-emerald-300 flex items-center gap-1">
+                            1️⃣ I полуизречение (Въпрос)
                         </button>
+                        <button onclick="playPhraseHalf(2)" class="glass-btn px-3.5 py-2.5 rounded-xl text-xs font-semibold text-amber-300 flex items-center gap-1">
+                            2️⃣ II полуизречение (Отговор)
+                        </button>
+                        <button id="btn-autopilot" onclick="startTeacherDictationCycle()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow">
+                            🎓 Автопилот за диктовка
+                        </button>
+                        <button id="btn-stop-audio" onclick="stopAudio()" class="glass-btn px-3.5 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 flex items-center gap-1.5">
+                            ⏹️ Спри
+                        </button>
+                    </div>
+
+                    <!-- Teacher Autopilot Status Bar -->
+                    <div id="autopilot-status-bar" class="hidden bg-emerald-950/50 border border-emerald-500/30 rounded-xl px-4 py-2.5 text-xs text-emerald-200 flex items-center justify-between">
+                        <span id="autopilot-status-text">🎓 Автопилот: Подготовка...</span>
+                        <button onclick="stopAudio()" class="text-rose-300 hover:text-rose-200 font-bold underline ml-3">Прекрати</button>
                     </div>
                 </div>
 
                 <!-- Sheet Music Display (abcjs container) -->
                 <div class="glass rounded-3xl p-6 shadow-xl flex flex-col gap-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Нотен текст (Визуализация)</span>
-                        <div class="flex gap-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-purple-400 uppercase tracking-wider">Нотен текст & Ученическа дъска</span>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="toggleFirstMeasureClue()" id="btn-clue-mode" class="glass-btn text-amber-300 border-amber-500/30 text-xs font-semibold px-3 py-1.5 rounded-lg">
+                                🎯 Само 1-ви такт (За дъска)
+                            </button>
                             <button onclick="toggleNotesVisibility()" id="btn-toggle-notes" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow transition-all">
                                 👁️ Скрий Нотите (за ученици)
                             </button>
+                            <button onclick="printWorksheet()" class="glass-btn text-emerald-300 text-xs font-semibold px-3 py-1.5 rounded-lg">
+                                🖨️ Принтирай лист
+                            </button>
                             <button onclick="copyABCCode()" class="glass-btn text-xs font-semibold px-3 py-1.5 rounded-lg">
-                                📋 Копирай ABC код
+                                📋 Копирай ABC
                             </button>
                         </div>
                     </div>
@@ -312,8 +365,19 @@
                         <div id="dictation-notation-render" class="w-full"></div>
                     </div>
 
+                    <!-- Harmonic & Pedagogical Analysis Bar (for Teacher) -->
+                    <div id="harmony-analysis-bar" class="bg-slate-900/70 border border-indigo-500/20 rounded-xl p-3 text-xs text-slate-300 flex flex-col gap-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-indigo-300">🎼 Хармоничен и структурен анализ (Д-р Елеонора):</span>
+                            <span id="analysis-cadence-badge" class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 text-[11px]">Класически период (Полукаденца ➔ Пълна каденца)</span>
+                        </div>
+                        <div id="analysis-chords-text" class="font-mono text-emerald-300 text-xs mt-0.5">
+                            Функции по тактове: I ➔ V (Полукаденца) ➔ IV ➔ V7–I (Пълна каденца)
+                        </div>
+                    </div>
+
                     <!-- ABC Editor -->
-                    <div class="flex flex-col gap-2 mt-2">
+                    <div class="flex flex-col gap-2 mt-1">
                         <label for="dictation-abc-editor" class="text-xs font-semibold text-slate-400">Ръчна корекция на ABC кода:</label>
                         <textarea id="dictation-abc-editor" rows="3" onchange="renderEditedABC()" class="w-full bg-slate-900/60 border border-slate-800 rounded-xl p-3 font-mono text-xs text-emerald-400 focus:ring-2 focus:ring-purple-500 focus:outline-none" placeholder="Нотен текст..."></textarea>
                     </div>
@@ -592,118 +656,424 @@
 
     <!-- JS Logic -->
     <script>
-        // ================= AUDIO ENGINE (Web Audio API & SoundFont Sampler) =================
+        // ================= AUDIO ENGINE (Web Audio API & SoundFont Sampler by Maestra Valeria) =================
         let audioCtx = null;
         let volumeNode = null;
+        let masterCompressor = null;
+        let reverbNode = null;
+        let dryGainNode = null;
+        let wetGainNode = null;
         let activeTimeouts = []; // Keeps track of queued tones to clear them on stop
-        let activeOscillators = []; // Keeps track of playing oscillators to stop them instantly
-        let sfPiano = null;
-        let sfLoading = false;
+        let activeOscillators = []; // Keeps track of playing oscillators/nodes to stop them instantly
+
+        // SoundFont Cache & Map
+        const SF_INSTRUMENT_MAP = {
+            piano: 'acoustic_grand_piano',
+            organ: 'church_organ',
+            violin: 'violin',
+            accordion: 'accordion',
+            guitar: 'acoustic_guitar_nylon',
+            bell: 'glockenspiel'
+        };
+        const sfCache = {};
+        const sfLoadingMap = {};
+
+        // Create Algorithmic Concert Hall Impulse Response for realistic spatial reverb
+        function createConcertHallReverb(ctx, duration = 2.2, decay = 2.6) {
+            const sampleRate = ctx.sampleRate;
+            const length = Math.floor(sampleRate * duration);
+            const impulse = ctx.createBuffer(2, length, sampleRate);
+            const left = impulse.getChannelData(0);
+            const right = impulse.getChannelData(1);
+
+            for (let i = 0; i < length; i++) {
+                const t = i / sampleRate;
+                const env = Math.pow(1 - i / length, decay);
+                const earlyBoost = t < 0.06 ? 1.35 * Math.sin(t * 180) : 1.0;
+                left[i] = (Math.random() * 2 - 1) * env * earlyBoost * 0.45;
+                right[i] = (Math.random() * 2 - 1) * env * earlyBoost * 0.45;
+            }
+            const convolver = ctx.createConvolver();
+            convolver.buffer = impulse;
+            return convolver;
+        }
+
+        function loadSoundFontInstrument(type) {
+            if (!audioCtx || !window.Soundfont) return;
+            const sfName = SF_INSTRUMENT_MAP[type];
+            if (!sfName || sfCache[type] || sfLoadingMap[type]) return;
+
+            sfLoadingMap[type] = true;
+            Soundfont.instrument(audioCtx, sfName, { soundfont: 'FluidR3_GM' })
+                .then(inst => {
+                    sfCache[type] = inst;
+                    sfLoadingMap[type] = false;
+                    console.log(`✨ [Maestra Valeria] Loaded HQ SoundFont: ${sfName} (${type})`);
+                })
+                .catch(err => {
+                    sfLoadingMap[type] = false;
+                    console.warn(`SoundFont (${sfName}) fallback to Maestra Valeria Physical Modeling Synth:`, err);
+                });
+        }
+
+        function preloadSelectedInstrument(type) {
+            initAudio();
+            loadSoundFontInstrument(type);
+        }
 
         function initAudio() {
-            if (audioCtx) return;
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            volumeNode = audioCtx.createGain();
-            volumeNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
-            volumeNode.connect(audioCtx.destination);
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-            // Preload SoundFont for high-fidelity acoustic piano samples
-            if (window.Soundfont && !sfPiano && !sfLoading) {
-                sfLoading = true;
-                Soundfont.instrument(audioCtx, 'acoustic_grand_piano', { soundfont: 'FluidR3_GM' })
-                    .then(inst => {
-                        sfPiano = inst;
-                        sfLoading = false;
-                        console.log('🎹 HQ Acoustic Piano SoundFont loaded successfully!');
-                    })
-                    .catch(err => {
-                        sfLoading = false;
-                        console.warn('SoundFont load fallback to enhanced synth:', err);
-                    });
+                // Master Dynamics Compressor for warm, non-clipping polyphony
+                masterCompressor = audioCtx.createDynamicsCompressor();
+                masterCompressor.threshold.setValueAtTime(-16, audioCtx.currentTime);
+                masterCompressor.knee.setValueAtTime(18, audioCtx.currentTime);
+                masterCompressor.ratio.setValueAtTime(3.5, audioCtx.currentTime);
+                masterCompressor.attack.setValueAtTime(0.005, audioCtx.currentTime);
+                masterCompressor.release.setValueAtTime(0.22, audioCtx.currentTime);
+
+                // Master Output Gain
+                volumeNode = audioCtx.createGain();
+                volumeNode.gain.setValueAtTime(0.75, audioCtx.currentTime);
+
+                // Dry / Wet Concert Hall Reverb Bus
+                dryGainNode = audioCtx.createGain();
+                wetGainNode = audioCtx.createGain();
+                dryGainNode.gain.setValueAtTime(0.82, audioCtx.currentTime);
+                wetGainNode.gain.setValueAtTime(0.28, audioCtx.currentTime);
+
+                reverbNode = createConcertHallReverb(audioCtx, 2.1, 2.5);
+
+                dryGainNode.connect(masterCompressor);
+                reverbNode.connect(wetGainNode);
+                wetGainNode.connect(masterCompressor);
+                masterCompressor.connect(volumeNode);
+                volumeNode.connect(audioCtx.destination);
+            }
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            // Preload flagship instruments in background
+            ['piano', 'violin', 'accordion', 'organ', 'guitar', 'bell'].forEach(inst => {
+                loadSoundFontInstrument(inst);
+            });
+        }
+
+        function connectToMasterBus(node, reverbSend = 0.28) {
+            node.connect(dryGainNode);
+            if (reverbNode && reverbSend > 0) {
+                const sendGain = audioCtx.createGain();
+                sendGain.gain.setValueAtTime(reverbSend, audioCtx.currentTime);
+                node.connect(sendGain);
+                sendGain.connect(reverbNode);
+                activeOscillators.push(sendGain);
             }
         }
 
         function stopAudio() {
-            // Cancel all scheduled timeouts
             activeTimeouts.forEach(t => clearTimeout(t));
             activeTimeouts = [];
 
-            // Stop all active oscillators instantly
+            const bar = document.getElementById('autopilot-status-bar');
+            if (bar) bar.classList.add('hidden');
+
             activeOscillators.forEach(node => {
                 try {
                     if (node.stop) node.stop();
-                    node.disconnect();
+                    if (node.disconnect) node.disconnect();
                 } catch(e) {}
             });
             activeOscillators = [];
-            if (sfPiano && sfPiano.stop) {
-                try { sfPiano.stop(); } catch(e) {}
-            }
+
+            Object.values(sfCache).forEach(inst => {
+                if (inst && inst.stop) {
+                    try { inst.stop(); } catch(e) {}
+                }
+            });
         }
 
         function midiToFreq(note) {
             return 440 * Math.pow(2, (note - 69) / 12);
         }
 
-        function playTone(note, duration, startTime, type = 'piano') {
+        // Expressive & Humanized Tone Generator
+        function playTone(note, duration, startTime, type = 'piano', velocity = 0.8, articulation = 'normal') {
             initAudio();
             const freq = midiToFreq(note);
             if (!freq || isNaN(freq)) return;
 
-            // Use sampled Steinway piano SoundFont if available
-            if (sfPiano && type === 'piano') {
+            const safeStart = Math.max(audioCtx.currentTime, startTime);
+            const vel = Math.max(0.15, Math.min(1.0, velocity));
+
+            let effectiveDur = duration;
+            if (articulation === 'staccato') effectiveDur = Math.max(0.08, duration * 0.45);
+            else if (articulation === 'legato') effectiveDur = duration * 1.06;
+            else if (articulation === 'tenuto') effectiveDur = duration * 0.98;
+            else effectiveDur = duration * 0.92;
+
+            const sfInst = sfCache[type];
+            if (sfInst) {
                 try {
-                    sfPiano.play(note, startTime, { duration: duration, gain: 0.85 });
+                    const sfGain = vel * (type === 'violin' ? 0.95 : type === 'organ' ? 0.75 : 0.9);
+                    const playedNode = sfInst.play(note, safeStart, {
+                        duration: effectiveDur,
+                        gain: sfGain
+                    });
+                    if (playedNode) activeOscillators.push(playedNode);
+                    if (type === 'violin' || type === 'accordion' || type === 'organ') {
+                        synthesizeInstrumentLayer(freq, effectiveDur, safeStart, type, vel * 0.22, articulation);
+                    }
                     return;
-                } catch(e) {
-                    console.warn("SoundFont play fallback:", e);
+                } catch (e) {
+                    console.warn("SoundFont play fallback to physical synth:", e);
                 }
             }
 
-            // Enhanced Additive & Filtered Acoustic Piano Physical Modeling Synth
+            synthesizeInstrumentLayer(freq, effectiveDur, safeStart, type, vel, articulation);
+        }
+
+        function synthesizeInstrumentLayer(freq, duration, startTime, type, vel, articulation) {
             if (type === 'piano') {
-                const osc1 = audioCtx.createOscillator(); // Fundamental
-                const osc2 = audioCtx.createOscillator(); // 2nd Harmonic
-                const osc3 = audioCtx.createOscillator(); // 3rd Harmonic
+                const partials = [
+                    { mult: 1, type: 'triangle', amp: 0.55, detune: -1.8 },
+                    { mult: 1, type: 'sine',     amp: 0.45, detune: 1.8 },
+                    { mult: 2, type: 'sine',     amp: 0.28 * vel, detune: 0.8 },
+                    { mult: 3, type: 'sine',     amp: 0.14 * vel * vel, detune: 1.5 },
+                    { mult: 4, type: 'sine',     amp: 0.06 * vel * vel, detune: 2.5 }
+                ];
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                const maxCutoff = Math.min(freq * (3.5 + vel * 6), 9500);
+                filter.frequency.setValueAtTime(maxCutoff, startTime);
+                filter.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.4, 320), startTime + duration);
+                filter.Q.setValueAtTime(1.2, startTime);
+
+                const envGain = audioCtx.createGain();
+                const peak = 0.48 * vel;
+                envGain.gain.setValueAtTime(0.0001, startTime);
+                envGain.gain.linearRampToValueAtTime(peak, startTime + 0.009);
+                envGain.gain.exponentialRampToValueAtTime(peak * 0.48, startTime + 0.14);
+                envGain.gain.exponentialRampToValueAtTime(Math.max(0.001, peak * 0.18), startTime + duration);
+                envGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration + 0.08);
+
+                partials.forEach(p => {
+                    const osc = audioCtx.createOscillator();
+                    const pGain = audioCtx.createGain();
+                    osc.type = p.type;
+                    osc.frequency.setValueAtTime(freq * p.mult, startTime);
+                    osc.detune.setValueAtTime(p.detune, startTime);
+                    pGain.gain.setValueAtTime(p.amp, startTime);
+                    osc.connect(pGain);
+                    pGain.connect(filter);
+                    osc.start(startTime);
+                    osc.stop(startTime + duration + 0.09);
+                    activeOscillators.push(osc, pGain);
+                });
+
+                filter.connect(envGain);
+                connectToMasterBus(envGain, 0.32);
+                activeOscillators.push(filter, envGain);
+
+            } else if (type === 'organ') {
+                const drawbars = [
+                    { mult: 0.5, amp: 0.18, detune: -2 },
+                    { mult: 1.0, amp: 0.42, detune: 0 },
+                    { mult: 1.0, amp: 0.22, detune: 4 },
+                    { mult: 2.0, amp: 0.28, detune: -1 },
+                    { mult: 3.0, amp: 0.14, detune: 1 },
+                    { mult: 4.0, amp: 0.12, detune: 2 },
+                    { mult: 5.0, amp: 0.06, detune: -2 }
+                ];
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(4800 + vel * 2200, startTime);
+
+                const envGain = audioCtx.createGain();
+                const sustainLevel = 0.34 * vel;
+                envGain.gain.setValueAtTime(0.0001, startTime);
+                envGain.gain.linearRampToValueAtTime(sustainLevel, startTime + 0.045);
+                envGain.gain.setValueAtTime(sustainLevel, Math.max(startTime + 0.05, startTime + duration - 0.05));
+                envGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration + 0.12);
+
+                drawbars.forEach(db => {
+                    const osc = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    osc.type = db.mult === 1.0 ? 'triangle' : 'sine';
+                    osc.frequency.setValueAtTime(freq * db.mult, startTime);
+                    osc.detune.setValueAtTime(db.detune, startTime);
+                    g.gain.setValueAtTime(db.amp, startTime);
+                    osc.connect(g);
+                    g.connect(filter);
+                    osc.start(startTime);
+                    osc.stop(startTime + duration + 0.13);
+                    activeOscillators.push(osc, g);
+                });
+
+                filter.connect(envGain);
+                connectToMasterBus(envGain, 0.50);
+                activeOscillators.push(filter, envGain);
+
+            } else if (type === 'violin') {
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                osc1.type = 'sawtooth';
+                osc2.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(freq, startTime);
+                osc2.frequency.setValueAtTime(freq, startTime);
+                osc2.detune.setValueAtTime(3.5, startTime);
+
+                const vibratoLFO = audioCtx.createOscillator();
+                const vibratoDepth = audioCtx.createGain();
+                vibratoLFO.type = 'sine';
+                vibratoLFO.frequency.setValueAtTime(5.8, startTime);
+                vibratoDepth.gain.setValueAtTime(0.0, startTime);
+                vibratoDepth.gain.linearRampToValueAtTime(freq * 0.0085, startTime + Math.min(0.22, duration * 0.45));
+                vibratoLFO.connect(vibratoDepth);
+                vibratoDepth.connect(osc1.frequency);
+                vibratoDepth.connect(osc2.frequency);
+
+                const bodyFormant1 = audioCtx.createBiquadFilter();
+                bodyFormant1.type = 'peaking';
+                bodyFormant1.frequency.setValueAtTime(290, startTime);
+                bodyFormant1.Q.setValueAtTime(2.2, startTime);
+                bodyFormant1.gain.setValueAtTime(5, startTime);
+
+                const bodyFormant2 = audioCtx.createBiquadFilter();
+                bodyFormant2.type = 'peaking';
+                bodyFormant2.frequency.setValueAtTime(1150, startTime);
+                bodyFormant2.Q.setValueAtTime(2.5, startTime);
+                bodyFormant2.gain.setValueAtTime(4, startTime);
+
+                const lowpass = audioCtx.createBiquadFilter();
+                lowpass.type = 'lowpass';
+                lowpass.frequency.setValueAtTime(Math.min(freq * 5.5 + vel * 1800, 6200), startTime);
+
+                const envGain = audioCtx.createGain();
+                const attackTime = articulation === 'staccato' ? 0.025 : Math.min(0.085, duration * 0.28);
+                const peakGain = 0.28 * vel;
+                envGain.gain.setValueAtTime(0.0001, startTime);
+                envGain.gain.linearRampToValueAtTime(peakGain * 0.85, startTime + attackTime);
+                envGain.gain.linearRampToValueAtTime(peakGain, startTime + Math.min(duration * 0.6, attackTime + 0.15));
+                envGain.gain.setValueAtTime(peakGain * 0.9, Math.max(startTime + attackTime, startTime + duration - 0.06));
+                envGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration + 0.07);
+
+                osc1.connect(bodyFormant1);
+                osc2.connect(bodyFormant1);
+                bodyFormant1.connect(bodyFormant2);
+                bodyFormant2.connect(lowpass);
+                lowpass.connect(envGain);
+                connectToMasterBus(envGain, 0.38);
+
+                osc1.start(startTime);
+                osc2.start(startTime);
+                vibratoLFO.start(startTime);
+                osc1.stop(startTime + duration + 0.08);
+                osc2.stop(startTime + duration + 0.08);
+                vibratoLFO.stop(startTime + duration + 0.08);
+
+                activeOscillators.push(osc1, osc2, vibratoLFO, vibratoDepth, bodyFormant1, bodyFormant2, lowpass, envGain);
+
+            } else if (type === 'accordion') {
+                const reeds = [
+                    { mult: 1.0, type: 'sawtooth', detune: 0,   amp: 0.30 },
+                    { mult: 1.0, type: 'sawtooth', detune: 13,  amp: 0.24 },
+                    { mult: 1.0, type: 'sawtooth', detune: -13, amp: 0.24 },
+                    { mult: 0.5, type: 'triangle', detune: 0,   amp: 0.16 },
+                    { mult: 2.0, type: 'sine',     detune: 3,   amp: 0.10 }
+                ];
+
+                const formant = audioCtx.createBiquadFilter();
+                formant.type = 'bandpass';
+                formant.frequency.setValueAtTime(Math.min(Math.max(freq * 2.4, 650), 3200), startTime);
+                formant.Q.setValueAtTime(0.75, startTime);
+
+                const lowpass = audioCtx.createBiquadFilter();
+                lowpass.type = 'lowpass';
+                lowpass.frequency.setValueAtTime(3400 + vel * 1500, startTime);
+
+                const envGain = audioCtx.createGain();
+                const peak = 0.34 * vel;
+                envGain.gain.setValueAtTime(0.0001, startTime);
+                envGain.gain.linearRampToValueAtTime(peak, startTime + 0.022);
+                envGain.gain.setValueAtTime(peak * 0.92, Math.max(startTime + 0.03, startTime + duration - 0.04));
+                envGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration + 0.04);
+
+                reeds.forEach(r => {
+                    const osc = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    osc.type = r.type;
+                    osc.frequency.setValueAtTime(freq * r.mult, startTime);
+                    osc.detune.setValueAtTime(r.detune, startTime);
+                    g.gain.setValueAtTime(r.amp, startTime);
+                    osc.connect(g);
+                    g.connect(formant);
+                    osc.start(startTime);
+                    osc.stop(startTime + duration + 0.05);
+                    activeOscillators.push(osc, g);
+                });
+
+                formant.connect(lowpass);
+                lowpass.connect(envGain);
+                connectToMasterBus(envGain, 0.24);
+                activeOscillators.push(formant, lowpass, envGain);
+
+            } else if (type === 'guitar') {
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const osc3 = audioCtx.createOscillator();
 
                 osc1.type = 'triangle';
                 osc1.frequency.setValueAtTime(freq, startTime);
 
-                osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(freq * 2, startTime);
+                osc2.type = 'sawtooth';
+                osc2.frequency.setValueAtTime(freq, startTime);
+                osc2.detune.setValueAtTime(2.0, startTime);
 
                 osc3.type = 'sine';
-                osc3.frequency.setValueAtTime(freq * 3, startTime);
+                osc3.frequency.setValueAtTime(freq * 2, startTime);
 
-                // Acoustic Filter Sweep
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(Math.min(freq * 6, 8000), startTime);
-                filter.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.5, 300), startTime + duration);
+                const g1 = audioCtx.createGain(); g1.gain.setValueAtTime(0.55, startTime);
+                const g2 = audioCtx.createGain(); g2.gain.setValueAtTime(0.28, startTime);
+                const g3 = audioCtx.createGain(); g3.gain.setValueAtTime(0.20, startTime);
 
-                // Dynamic Envelope
-                const gainNode = audioCtx.createGain();
-                gainNode.gain.setValueAtTime(0.001, startTime);
-                gainNode.gain.linearRampToValueAtTime(0.45, startTime + 0.012);
-                gainNode.gain.exponentialRampToValueAtTime(0.22, startTime + 0.15);
-                gainNode.gain.setValueAtTime(0.18, startTime + duration - 0.08);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+                const pluckFilter = audioCtx.createBiquadFilter();
+                pluckFilter.type = 'lowpass';
+                pluckFilter.frequency.setValueAtTime(Math.min(freq * 9 * vel, 7500), startTime);
+                pluckFilter.frequency.exponentialRampToValueAtTime(Math.max(freq * 1.6, 380), startTime + Math.min(0.25, duration * 0.7));
 
-                osc1.connect(filter);
-                osc2.connect(filter);
-                osc3.connect(filter);
-                filter.connect(gainNode);
-                gainNode.connect(volumeNode);
+                const bodyRes = audioCtx.createBiquadFilter();
+                bodyRes.type = 'peaking';
+                bodyRes.frequency.setValueAtTime(195, startTime);
+                bodyRes.Q.setValueAtTime(2.0, startTime);
+                bodyRes.gain.setValueAtTime(4.5, startTime);
 
-                osc1.start(startTime);
-                osc2.start(startTime);
-                osc3.start(startTime);
+                const envGain = audioCtx.createGain();
+                const peak = 0.50 * vel;
+                const guitarDur = Math.max(duration, 0.35);
+                envGain.gain.setValueAtTime(0.0001, startTime);
+                envGain.gain.linearRampToValueAtTime(peak, startTime + 0.006);
+                envGain.gain.exponentialRampToValueAtTime(peak * 0.38, startTime + 0.12);
+                envGain.gain.exponentialRampToValueAtTime(0.0001, startTime + guitarDur + 0.06);
 
-                osc1.stop(startTime + duration);
-                osc2.stop(startTime + duration);
-                osc3.stop(startTime + duration);
+                osc1.connect(g1); g1.connect(pluckFilter);
+                osc2.connect(g2); g2.connect(pluckFilter);
+                osc3.connect(g3); g3.connect(pluckFilter);
+                pluckFilter.connect(bodyRes);
+                bodyRes.connect(envGain);
+                connectToMasterBus(envGain, 0.28);
 
-                activeOscillators.push(osc1, osc2, osc3, gainNode, filter);
+                osc1.start(startTime); osc2.start(startTime); osc3.start(startTime);
+                osc1.stop(startTime + guitarDur + 0.07);
+                osc2.stop(startTime + guitarDur + 0.07);
+                osc3.stop(startTime + guitarDur + 0.07);
+
+                activeOscillators.push(osc1, osc2, osc3, g1, g2, g3, pluckFilter, bodyRes, envGain);
+
             } else if (type === 'bell') {
                 const osc = audioCtx.createOscillator();
                 const osc2 = audioCtx.createOscillator();
@@ -713,23 +1083,23 @@
                 osc.frequency.setValueAtTime(freq, startTime);
 
                 osc2.type = 'sine';
-                osc2.frequency.setValueAtTime(freq * 3, startTime);
+                osc2.frequency.setValueAtTime(freq * 2.756, startTime);
 
-                gainNode.gain.setValueAtTime(0, startTime);
-                gainNode.gain.linearRampToValueAtTime(0.55, startTime + 0.008);
-                gainNode.gain.exponentialRampToValueAtTime(0.04, startTime + 0.18);
-                gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+                gainNode.gain.setValueAtTime(0.0001, startTime);
+                gainNode.gain.linearRampToValueAtTime(0.50 * vel, startTime + 0.006);
+                gainNode.gain.exponentialRampToValueAtTime(0.05 * vel, startTime + 0.18);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration + 0.1);
 
                 osc.connect(gainNode);
                 osc2.connect(gainNode);
-                gainNode.connect(volumeNode);
+                connectToMasterBus(gainNode, 0.35);
 
                 osc.start(startTime);
                 osc2.start(startTime);
-                osc.stop(startTime + duration);
-                osc2.stop(startTime + duration);
+                osc.stop(startTime + duration + 0.12);
+                osc2.stop(startTime + duration + 0.12);
 
-                activeOscillators.push(osc, osc2);
+                activeOscillators.push(osc, osc2, gainNode);
             } else {
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
@@ -737,18 +1107,18 @@
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, startTime);
 
-                gainNode.gain.setValueAtTime(0, startTime);
-                gainNode.gain.linearRampToValueAtTime(0.25, startTime + 0.04);
-                gainNode.gain.setValueAtTime(0.25, startTime + duration - 0.04);
+                gainNode.gain.setValueAtTime(0.0001, startTime);
+                gainNode.gain.linearRampToValueAtTime(0.28 * vel, startTime + 0.03);
+                gainNode.gain.setValueAtTime(0.28 * vel, Math.max(startTime + 0.04, startTime + duration - 0.04));
                 gainNode.gain.linearRampToValueAtTime(0.0001, startTime + duration);
 
                 osc.connect(gainNode);
-                gainNode.connect(volumeNode);
+                connectToMasterBus(gainNode, 0.15);
 
                 osc.start(startTime);
-                osc.stop(startTime + duration);
+                osc.stop(startTime + duration + 0.02);
 
-                activeOscillators.push(osc);
+                activeOscillators.push(osc, gainNode);
             }
         }
 
@@ -866,56 +1236,143 @@
             }
         };
 
+        // ============================================================================
+        // DR. ELEONORA'S ACADEMIC SOLFEGE & MELODY ENGINE (NMA EDITION)
+        // ============================================================================
+
+        const KEY_SIGNATURE_THEORY = {
+            'C':   { tonic: 60, isMinor: false, tonicLetterIdx: 0, sigAccidentals: {} },
+            'G':   { tonic: 67, isMinor: false, tonicLetterIdx: 4, sigAccidentals: { F: 1 } },
+            'D':   { tonic: 62, isMinor: false, tonicLetterIdx: 1, sigAccidentals: { F: 1, C: 1 } },
+            'A':   { tonic: 69, isMinor: false, tonicLetterIdx: 5, sigAccidentals: { F: 1, C: 1, G: 1 } },
+            'F':   { tonic: 65, isMinor: false, tonicLetterIdx: 3, sigAccidentals: { B: -1 } },
+            'Bb':  { tonic: 58, isMinor: false, tonicLetterIdx: 6, sigAccidentals: { B: -1, E: -1 } },
+            'Eb':  { tonic: 63, isMinor: false, tonicLetterIdx: 2, sigAccidentals: { B: -1, E: -1, A: -1 } },
+
+            'Am':  { tonic: 57, isMinor: true,  tonicLetterIdx: 5, sigAccidentals: {} },
+            'Em':  { tonic: 64, isMinor: true,  tonicLetterIdx: 2, sigAccidentals: { F: 1 } },
+            'Bm':  { tonic: 59, isMinor: true,  tonicLetterIdx: 6, sigAccidentals: { F: 1, C: 1 } },
+            'F#m': { tonic: 66, isMinor: true,  tonicLetterIdx: 3, sigAccidentals: { F: 1, C: 1, G: 1 } },
+            'Dm':  { tonic: 62, isMinor: true,  tonicLetterIdx: 1, sigAccidentals: { B: -1 } },
+            'Gm':  { tonic: 55, isMinor: true,  tonicLetterIdx: 4, sigAccidentals: { B: -1, E: -1 } },
+            'Cm':  { tonic: 60, isMinor: true,  tonicLetterIdx: 0, sigAccidentals: { B: -1, E: -1, A: -1 } }
+        };
+
+        const DIATONIC_LETTERS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+        const NATURAL_LETTER_SEMITONES = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+        const PEDAGOGICAL_PRESETS = {
+            'tonic_triad_steps': {
+                id: 'tonic_triad_steps',
+                title: "1. Тоническо тризвучие и постепенно движение",
+                meter: '2/4', length: 4, scaleType: 'natural', tempo: 76,
+                leaps: { step: true, third: true, fourthFifth: false, sixthSeventh: false, octave: false },
+                rhythms: { eighths: true, sixteenths: false, dotted: false, syncopation: false, triplet: false },
+                styleFocus: 'triad_and_steps'
+            },
+            'enclosure_stable_degrees': {
+                id: 'enclosure_stable_degrees',
+                title: "2. Опеване на устойчивите степени (I, III и V)",
+                meter: '2/4', length: 4, scaleType: 'harmonic', tempo: 80,
+                leaps: { step: true, third: true, fourthFifth: false, sixthSeventh: false, octave: false },
+                rhythms: { eighths: true, sixteenths: false, dotted: false, syncopation: false, triplet: false },
+                styleFocus: 'enclosures'
+            },
+            'leaps_p4_p5_td': {
+                id: 'leaps_p4_p5_td',
+                title: "3. Скокове на ч4 и ч5 (T - S - D - T)",
+                meter: '3/4', length: 4, scaleType: 'harmonic', tempo: 84,
+                leaps: { step: true, third: true, fourthFifth: true, sixthSeventh: false, octave: false },
+                rhythms: { eighths: true, sixteenths: false, dotted: true, syncopation: false, triplet: false },
+                styleFocus: 'fourth_fifth_leaps'
+            },
+            'dotted_and_sixteenths': {
+                id: 'dotted_and_sixteenths',
+                title: "4. Пунктиран ритъм и шестнадесетини в период",
+                meter: '4/4', length: 8, scaleType: 'harmonic', tempo: 82,
+                leaps: { step: true, third: true, fourthFifth: true, sixthSeventh: false, octave: false },
+                rhythms: { eighths: true, sixteenths: true, dotted: true, syncopation: false, triplet: false },
+                styleFocus: 'dotted_classic'
+            },
+            'melodic_minor_arpeggios': {
+                id: 'melodic_minor_arpeggios',
+                title: "5. Мелодичен лад и разлагания S-D7-T",
+                meter: '4/4', length: 8, scaleType: 'melodic', tempo: 78,
+                leaps: { step: true, third: true, fourthFifth: true, sixthSeventh: true, octave: false },
+                rhythms: { eighths: true, sixteenths: true, dotted: true, syncopation: true, triplet: false },
+                styleFocus: 'melodic_minor_voice_leading'
+            },
+            'bulgarian_asymmetric_rachenitsa': {
+                id: 'bulgarian_asymmetric_rachenitsa',
+                title: "6. Български неравноделни размери (7/8 Ръченица)",
+                meter: '7/8', length: 8, scaleType: 'natural', tempo: 112,
+                leaps: { step: true, third: true, fourthFifth: true, sixthSeventh: false, octave: false },
+                rhythms: { quarter: true, dotted: true },
+                styleFocus: 'bulgarian_folk'
+            }
+        };
+
         function getHarmonicProgression(key, numMeasures) {
             const isMinor = key.includes('m');
-            const mode = isMinor ? 'minor' : 'major';
-            
-            // A-B-A-C Phrase Structure (Музикален синтаксис)
+            const T = isMinor ? 'i' : 'I';
+            const S = isMinor ? 'iv' : 'IV';
+            const II = isMinor ? 'ii0' : 'ii';
+            const VI = isMinor ? 'VI' : 'vi';
+            const D = 'V';
+            const D7 = 'V7';
+
             if (numMeasures === 4) {
-                return mode === 'major' ? ['I', 'V', 'I', 'I'] : ['i', 'V', 'i', 'i'];
+                const subdominantChoice = Math.random() < 0.65 ? S : II;
+                return [T, D, subdominantChoice, T];
             }
+
             if (numMeasures === 8) {
-                if (mode === 'major') {
-                    const choices = [
-                        ['I', 'IV', 'I', 'V', 'I', 'IV', 'V', 'I'],
-                        ['I', 'vi', 'ii', 'V', 'I', 'vi', 'V7', 'I']
-                    ];
-                    return choices[Math.floor(Math.random() * choices.length)];
+                const variant = Math.random();
+                if (variant < 0.5) {
+                    return [T, S, T, D, T, VI, D7, T];
                 } else {
-                    const choices = [
-                        ['i', 'iv', 'i', 'V', 'i', 'iv', 'V', 'i'],
-                        ['i', 'VI', 'ii0', 'V', 'i', 'VI', 'V7', 'i']
-                    ];
-                    return choices[Math.floor(Math.random() * choices.length)];
+                    return [T, VI, II, D, T, S, D7, T];
                 }
             }
 
-            const available = PROGRESSIONS[mode];
-            // Find closest available length
-            const lengths = Object.keys(available).map(Number).sort((a,b) => a-b);
-            let bestLen = lengths[lengths.length - 1];
-            for (const l of lengths) {
-                if (l >= numMeasures) { bestLen = l; break; }
+            const halfIdx = Math.floor(numMeasures / 2) - 1;
+            const prog = [];
+            for (let m = 0; m < numMeasures; m++) {
+                if (m === 0 || m === halfIdx + 1) prog.push(T);
+                else if (m === halfIdx) prog.push(D);
+                else if (m === numMeasures - 2) prog.push(D7);
+                else if (m === numMeasures - 3) prog.push(S);
+                else if (m === numMeasures - 1) prog.push(T);
+                else prog.push(m % 2 === 1 ? S : VI);
             }
-            const progs = available[bestLen];
-            const chosen = progs[Math.floor(Math.random() * progs.length)];
-            // Trim or repeat to match numMeasures
-            const result = [];
-            for (let i = 0; i < numMeasures; i++) {
-                result.push(chosen[i % chosen.length]);
-            }
-            return result;
+            return prog;
         }
 
         function isChordTone(scaleIdx, chordSymbol, key, pitchBank, tonic) {
             const isMinor = key.includes('m');
             const mode = isMinor ? 'minor' : 'major';
             const chordDegrees = CHORD_TONES[mode][chordSymbol] || [0, 2, 4];
-            
-            // pitchBank has exactly 7 unique pitches per octave.
-            // Index 0 is tonic (in the lowest octave generated).
-            const degree = scaleIdx % 7;
+            const degree = ((scaleIdx % 7) + 7) % 7;
             return chordDegrees.includes(degree);
+        }
+
+        function getPitchForScaleDegree(scaleIdx, tonicIdx, basePitchBank, key, scaleType, direction = 0) {
+            const clampedIdx = Math.max(0, Math.min(basePitchBank.length - 1, scaleIdx));
+            let midi = basePitchBank[clampedIdx];
+            const isMinor = key.includes('m');
+            const degree = ((clampedIdx - tonicIdx) % 7 + 7) % 7;
+
+            if (isMinor && scaleType === 'melodic') {
+                const octaveBase = midi - (((midi - KEY_TONICS[key]) % 12 + 12) % 12);
+                if (direction >= 0) {
+                    if (degree === 5) midi = octaveBase + 9;
+                    if (degree === 6) midi = octaveBase + 11;
+                } else {
+                    if (degree === 5) midi = octaveBase + 8;
+                    if (degree === 6) midi = octaveBase + 10;
+                }
+            }
+            return midi;
         }
 
         function updateScaleTypeOptions() {
@@ -929,13 +1386,13 @@
             
             if (isMinor) {
                 scaleSelect.innerHTML += '<option value="natural">Натурален</option>';
-                scaleSelect.innerHTML += '<option value="harmonic">Хармоничен</option>';
-                scaleSelect.innerHTML += '<option value="melodic">Мелодичен</option>';
+                scaleSelect.innerHTML += '<option value="harmonic">Хармоничен (повишена VII ст.)</option>';
+                scaleSelect.innerHTML += '<option value="melodic">Мелодичен (↑#VI,#VII / ↓♮VII,♮VI)</option>';
                 scaleSelect.innerHTML += '<option value="biharmonic">Бихармоничен (Двойно хармоничен)</option>';
             } else {
                 scaleSelect.innerHTML += '<option value="natural">Натурален</option>';
-                scaleSelect.innerHTML += '<option value="harmonic">Хармоничен (понижена 6-та)</option>';
-                scaleSelect.innerHTML += '<option value="melodic">Мелодичен (понижена 6-та и 7-ма)</option>';
+                scaleSelect.innerHTML += '<option value="harmonic">Хармоничен (понижена VI ст.)</option>';
+                scaleSelect.innerHTML += '<option value="melodic">Мелодичен (понижена VI и VII ст.)</option>';
                 scaleSelect.innerHTML += '<option value="biharmonic">Бихармоничен (Двойно хармоничен)</option>';
             }
             
@@ -954,6 +1411,7 @@
         let currentBuilderElement = null;
         let currentSingingTask = null;
         let isNotesVisible = true;
+        let isClueMode = false;
 
         // ================= INIT =================
         window.addEventListener('load', () => {
@@ -1013,7 +1471,6 @@
             const isUneven = ['3/8', '6/8', '12/8', '5/8', '7/8', '9/8', '11/8'].includes(meter);
 
             if (isUneven) {
-                // Uneven meters are mostly subdivision based (eighths and quarters)
                 container.innerHTML = `
                     <label class="flex items-center gap-2 text-xs text-slate-300">
                         <input type="checkbox" id="rhy-uneven-basic" checked disabled>
@@ -1029,7 +1486,6 @@
                     </label>
                 `;
             } else {
-                // Standard meters (2/4, 3/4, 4/4)
                 container.innerHTML = `
                     <label class="flex items-center gap-2 text-xs text-slate-300">
                         <input type="checkbox" id="rhy-quarter" checked disabled>
@@ -1063,7 +1519,10 @@
         function generateDictation() {
             stopAudio();
             isNotesVisible = true;
+            isClueMode = false;
             document.getElementById('btn-toggle-notes').innerText = "👁️ Скрий Нотите (за ученици)";
+            const clueBtn = document.getElementById('btn-clue-mode');
+            if (clueBtn) clueBtn.innerText = "🎯 Само 1-ви такт (За дъска)";
             document.getElementById('dictation-notation-container').classList.remove('hidden');
 
             const key = document.getElementById('dict-key').value;
@@ -1072,7 +1531,6 @@
             const scaleTypeNode = document.getElementById('dict-scale-type');
             const scaleType = scaleTypeNode ? scaleTypeNode.value : 'natural';
             
-            // Collect config
             const leaps = {
                 step: true,
                 third: document.getElementById('leap-3rd').checked,
@@ -1094,15 +1552,27 @@
                 rhythms.triplet = document.getElementById('rhy-triplet').checked;
             }
 
+            const analysisBar = document.getElementById('harmony-analysis-bar');
+
             if (dictationType === 'melodic') {
                 currentDictation = generateMelodicDictationAlgo(key, meter, length, leaps, rhythms, scaleType);
-                document.getElementById('output-meta-text').innerText = `Генерирана: ${translateKeyToBG(key)}, размер ${meter}, ${length} такта`;
+                document.getElementById('output-meta-text').innerText = `Генерирана: ${translateKeyToBG(key)} (${scaleType}), размер ${meter}, ${length} такта`;
+                if (analysisBar && currentDictation.harmony) {
+                    analysisBar.classList.remove('hidden');
+                    const halfIdx = Math.floor(length / 2) - 1;
+                    const chordLabels = currentDictation.harmony.map((c, idx) => {
+                        if (idx === halfIdx) return `T.${idx+1}: ${c} (Полукаденца)`;
+                        if (idx === length - 1) return `T.${idx+1}: V7➔${c} (Пълна каденца)`;
+                        return `T.${idx+1}: ${c}`;
+                    }).join('  |  ');
+                    document.getElementById('analysis-chords-text').innerText = chordLabels;
+                }
             } else {
                 currentDictation = generateRhythmicDictationAlgo(meter, length, rhythms);
                 document.getElementById('output-meta-text').innerText = `Генерирана: Ритмическа, размер ${meter}, ${length} такта`;
+                if (analysisBar) analysisBar.classList.add('hidden');
             }
 
-            // Populate ABC editor
             document.getElementById('dictation-abc-editor').value = currentDictation.abc;
             renderNotation('dictation-notation-render', currentDictation.abc);
         }
@@ -1116,50 +1586,45 @@
             return translation[key] || key;
         }
 
-        // ================= ALGORITHMS: MUSICAL MELODY GENERATOR =================
+        // ================= ALGORITHMS: DR. ELEONORA'S MUSICAL MELODY GENERATOR =================
         function generateMelodicDictationAlgo(key, meter, length, leaps, rhythms, scaleType = 'natural') {
             const tonic = KEY_TONICS[key] || 60;
             const isMinor = key.includes('m');
-            let scale = [];
+            const styleFocus = window.activePedagogicalPreset ? window.activePedagogicalPreset.styleFocus : null;
 
+            let sevenStepScale = [];
             if (isMinor) {
-                switch(scaleType) {
-                    case 'natural': scale = [0, 2, 3, 5, 7, 8, 10, 12]; break;
-                    case 'harmonic': scale = [0, 2, 3, 5, 7, 8, 11, 12]; break;
-                    case 'melodic': scale = [0, 2, 3, 5, 7, 9, 11, 12]; break;
-                    case 'biharmonic': scale = [0, 2, 3, 6, 7, 8, 11, 12]; break;
-                    default: scale = [0, 2, 3, 5, 7, 8, 11, 12]; // fallback harmonic
+                switch (scaleType) {
+                    case 'natural':    sevenStepScale = [0, 2, 3, 5, 7, 8, 10]; break;
+                    case 'harmonic':   sevenStepScale = [0, 2, 3, 5, 7, 8, 11]; break;
+                    case 'melodic':    sevenStepScale = [0, 2, 3, 5, 7, 9, 11]; break;
+                    case 'biharmonic': sevenStepScale = [0, 2, 3, 6, 7, 8, 11]; break;
+                    default:           sevenStepScale = [0, 2, 3, 5, 7, 8, 11];
                 }
             } else {
-                switch(scaleType) {
-                    case 'natural': scale = [0, 2, 4, 5, 7, 9, 11, 12]; break;
-                    case 'harmonic': scale = [0, 2, 4, 5, 7, 8, 11, 12]; break;
-                    case 'melodic': scale = [0, 2, 4, 5, 7, 8, 10, 12]; break;
-                    case 'biharmonic': scale = [0, 1, 4, 5, 7, 8, 11, 12]; break;
-                    default: scale = [0, 2, 4, 5, 7, 9, 11, 12]; // fallback natural
+                switch (scaleType) {
+                    case 'natural':    sevenStepScale = [0, 2, 4, 5, 7, 9, 11]; break;
+                    case 'harmonic':   sevenStepScale = [0, 2, 4, 5, 7, 8, 11]; break;
+                    case 'melodic':    sevenStepScale = [0, 2, 4, 5, 7, 8, 10]; break;
+                    case 'biharmonic': sevenStepScale = [0, 1, 4, 5, 7, 8, 11]; break;
+                    default:           sevenStepScale = [0, 2, 4, 5, 7, 9, 11];
                 }
             }
-            
-            const pitchBank = [];
+
+            const uniquePitchBank = [];
             for (let oct = -1; oct <= 1; oct++) {
-                scale.forEach(step => {
-                    pitchBank.push(tonic + step + oct * 12);
-                });
+                for (let s = 0; s < 7; s++) {
+                    uniquePitchBank.push(tonic + sevenStepScale[s] + oct * 12);
+                }
             }
-            pitchBank.sort((a,b) => a-b);
-            // Remove duplicates
-            const uniquePitchBank = [...new Set(pitchBank)];
-            
+            uniquePitchBank.push(tonic + 24);
+
             let tonicIdx = uniquePitchBank.indexOf(tonic);
-            if (tonicIdx === -1) tonicIdx = Math.floor(uniquePitchBank.length / 2);
+            if (tonicIdx === -1) tonicIdx = 7;
 
-            let currentScaleIdx = tonicIdx;
+            const startChoices = leaps.third ? [0, 2, 4] : [0];
+            let currentScaleIdx = tonicIdx + startChoices[Math.floor(Math.random() * startChoices.length)];
             let lastStepDelta = 0;
-            
-            let isVeryFirstNote = true;
-            const startDegreeOffsets = [0, 2, 4, 7];
-            const firstNoteOffset = startDegreeOffsets[Math.floor(Math.random() * startDegreeOffsets.length)];
-
 
             let beatsPerMeasure = 2;
             if (meter === '3/4') beatsPerMeasure = 3;
@@ -1172,510 +1637,553 @@
             else if (meter === '9/8') beatsPerMeasure = 4.5;
             else if (meter === '11/8') beatsPerMeasure = 5.5;
 
+            const isUneven = ['3/8', '6/8', '12/8', '5/8', '7/8', '9/8', '11/8'].includes(meter);
+            const harmony = getHarmonicProgression(key, length);
+            const halfCadenceMeasure = (length === 4) ? 1 : (Math.floor(length / 2) - 1);
+            const consequentStartMeasure = halfCadenceMeasure + 1;
+
             const playbackNotes = [];
             let timeAccumulator = 0;
-            const isUneven = ['3/8', '6/8', '12/8', '5/8', '7/8', '9/8', '11/8'].includes(meter);
 
-            // Get harmonic progression
-            const harmony = getHarmonicProgression(key, length);
-
-            let abcHeader = `X:1\nT:Мелодическа диктовка\nM:${meter}\nL:1/8\nK:${key}\n`;
-            if (!isUneven) {
-                abcHeader = `X:1\nT:Мелодическа диктовка\nM:${meter}\nL:1/4\nK:${key}\n`;
-            }
+            const abcHeader = isUneven
+                ? `X:1\nT:Мелодическа диктовка\nM:${meter}\nL:1/8\nK:${key}\n`
+                : `X:1\nT:Мелодическа диктовка\nM:${meter}\nL:1/4\nK:${key}\n`;
 
             let abcBody = "";
+            let measuresAbcList = [];
+            let openingMeasureEvents = [];
 
-            // Motif storage: save first 2-beat pattern for reuse
-            let motifPitchOffsets = []; // offsets from first note of motif
-            let motifRhythmCells = [];
-            let motifCaptured = false;
-            let motifBaseIdx = tonicIdx;
+            function emitNote(scaleIdx, durationBeats, abcDurationStr, measureAccState, directionHint = null) {
+                const dir = directionHint !== null ? directionHint : lastStepDelta;
+                const pitch = getPitchForScaleDegree(scaleIdx, tonicIdx, uniquePitchBank, key, scaleType, dir);
+                playbackNotes.push({
+                    note: pitch,
+                    time: timeAccumulator,
+                    duration: durationBeats
+                });
+                timeAccumulator += durationBeats;
+                const abcNote = midiToABCNote(pitch, key, scaleType, measureAccState);
+                return `${abcNote}${abcDurationStr}`;
+            }
 
             for (let m = 0; m < length; m++) {
-                let beatsInMeasure = 0;
+                const isHalfCadenceMeasure = (m === halfCadenceMeasure);
                 const isLastMeasure = (m === length - 1);
-                const isClimaxMeasure = (m === Math.floor((length - 1) * 0.75));
-                const currentChord = harmony[m] || 'I';
+                const isPreCadenceMeasure = (m === length - 2);
+                const isConsequentOpening = (length >= 8 && m === consequentStartMeasure);
+                const currentChord = harmony[m] || (isMinor ? 'i' : 'I');
+
+                const measureAccState = {};
                 let measureAbc = "";
-                let beatCounter = 0; // track beat position within measure
 
                 if (isUneven) {
                     let groupings = [2, 3];
                     if (meter === '3/8') groupings = [3];
                     else if (meter === '6/8') groupings = [3, 3];
                     else if (meter === '12/8') groupings = [3, 3, 3, 3];
-                    else if (meter === '7/8') groupings = [3, 2, 2];
+                    else if (meter === '7/8') groupings = [2, 2, 3];
                     else if (meter === '9/8') groupings = [2, 2, 2, 3];
-                    else if (meter === '11/8') groupings = [3, 2, 2, 2, 2];
+                    else if (meter === '11/8') groupings = [2, 2, 3, 2, 2];
 
-                    groupings.forEach((groupVal, groupIdx) => {
-                        let filled = 0;
-                        let groupAbc = "";
+                    if (isLastMeasure) {
+                        groupings.forEach((groupVal, gIdx) => {
+                            const isLastGroup = (gIdx === groupings.length - 1);
+                            const isPenultimateGroup = (gIdx === groupings.length - 2);
 
-                        while (filled < groupVal) {
-                            const isLastNoteOfGroup = (groupVal - filled === 1);
-                            const isFinalGroupNote = isLastMeasure && (groupIdx === groupings.length - 1) && isLastNoteOfGroup;
-
-                            if (isFinalGroupNote) {
-                                // Approach tonic: try to land on degree 2 or 7 before resolving
+                            if (isLastGroup) {
                                 currentScaleIdx = tonicIdx;
                                 lastStepDelta = 0;
+                                measureAbc += emitNote(currentScaleIdx, groupVal * 0.5, groupVal > 1 ? String(groupVal) : "", measureAccState, 1) + " ";
+                            } else if (isPenultimateGroup) {
+                                const cadenceApproach = (Math.random() < 0.6) ? (tonicIdx - 1) : (tonicIdx + 1);
+                                lastStepDelta = cadenceApproach - currentScaleIdx;
+                                currentScaleIdx = cadenceApproach;
+                                measureAbc += emitNote(currentScaleIdx, groupVal * 0.5, groupVal > 1 ? String(groupVal) : "", measureAccState, 1) + " ";
                             } else {
-                                const isStrong = (filled === 0);
-                                const unevenOpts = {
-                                    chordSymbol: currentChord, key, pitchBank: uniquePitchBank, tonic, isStrongBeat: isStrong
-                                };
-                                if (isVeryFirstNote) {
-                                    unevenOpts.forceIdx = tonicIdx + firstNoteOffset;
-                                    isVeryFirstNote = false;
+                                const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                                    chordSymbol: 'V7', key, pitchBank: uniquePitchBank, tonic, isStrongBeat: true, scaleType
+                                });
+                                lastStepDelta = nextInfo.idx - currentScaleIdx;
+                                currentScaleIdx = nextInfo.idx;
+                                measureAbc += emitNote(currentScaleIdx, groupVal * 0.5, groupVal > 1 ? String(groupVal) : "", measureAccState) + " ";
+                            }
+                        });
+                        measuresAbcList.push(measureAbc + "|]");
+                        abcBody += measureAbc + "|] ";
+                        continue;
+                    }
+
+                    if (isHalfCadenceMeasure) {
+                        groupings.forEach((groupVal, gIdx) => {
+                            const isLastGroup = (gIdx === groupings.length - 1);
+                            if (isLastGroup) {
+                                const hcTargets = [tonicIdx + 4, tonicIdx + 1, tonicIdx - 3];
+                                let bestTarget = hcTargets[0];
+                                let minDist = 99;
+                                for (const t of hcTargets) {
+                                    if (Math.abs(t - currentScaleIdx) < minDist) {
+                                        minDist = Math.abs(t - currentScaleIdx);
+                                        bestTarget = t;
+                                    }
                                 }
-                                const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, unevenOpts);
+                                lastStepDelta = bestTarget - currentScaleIdx;
+                                currentScaleIdx = bestTarget;
+                                measureAbc += emitNote(currentScaleIdx, groupVal * 0.5, groupVal > 1 ? String(groupVal) : "", measureAccState) + " ";
+                            } else {
+                                const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                                    chordSymbol: 'V', key, pitchBank: uniquePitchBank, tonic, isStrongBeat: true, scaleType
+                                });
+                                lastStepDelta = nextInfo.idx - currentScaleIdx;
+                                currentScaleIdx = nextInfo.idx;
+                                measureAbc += emitNote(currentScaleIdx, groupVal * 0.5, groupVal > 1 ? String(groupVal) : "", measureAccState) + " ";
+                            }
+                        });
+                        measuresAbcList.push(measureAbc + "|");
+                        abcBody += measureAbc + "| ";
+                        continue;
+                    }
+
+                    groupings.forEach((groupVal) => {
+                        let filled = 0;
+                        let groupAbc = "";
+                        while (filled < groupVal) {
+                            let dur = 1;
+                            if (groupVal - filled === 3 && rhythms.dotted && Math.random() > 0.45) {
+                                dur = 3;
+                            } else if (groupVal - filled >= 2 && rhythms.quarter && Math.random() > 0.45) {
+                                dur = 2;
+                            }
+
+                            const isSubdivision = (dur === 1 && filled > 0);
+                            const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                                chordSymbol: currentChord, key, pitchBank: uniquePitchBank, tonic,
+                                isStrongBeat: filled === 0, scaleType, subdivisionMode: isSubdivision, styleFocus
+                            });
+                            if (!(m === 0 && filled === 0 && groupAbc === "")) {
                                 lastStepDelta = nextInfo.idx - currentScaleIdx;
                                 currentScaleIdx = nextInfo.idx;
                             }
 
-                            const pitch = uniquePitchBank[currentScaleIdx];
-                            let dur = 1;
-                            if (groupVal - filled >= 3 && rhythms.dotted && Math.random() > 0.6) {
-                                dur = 3;
-                            } else if (groupVal - filled >= 2 && rhythms.quarter && Math.random() > 0.5) {
-                                dur = 2;
-                            }
-
-                            playbackNotes.push({
-                                note: pitch,
-                                time: timeAccumulator,
-                                duration: dur * 0.5
-                            });
-
-                            const noteChar = midiToABCNote(pitch, key);
-                            if (dur === 3) groupAbc += `${noteChar}3`;
-                            else if (dur === 2) groupAbc += `${noteChar}2`;
-                            else groupAbc += noteChar;
-
-                            timeAccumulator += dur * 0.5;
+                            groupAbc += emitNote(currentScaleIdx, dur * 0.5, dur > 1 ? String(dur) : "", measureAccState);
                             filled += dur;
                         }
                         measureAbc += groupAbc + " ";
                     });
+                    measuresAbcList.push(measureAbc + "|");
                     abcBody += measureAbc + "| ";
-                } else {
-                    // Standard Meter (2/4, 3/4, 4/4)
-                    while (beatsInMeasure < beatsPerMeasure) {
-                        const remainingBeats = beatsPerMeasure - beatsInMeasure;
-                        const isFinalBeat = (remainingBeats <= 1.0);
-                        const isStrongBeat = (beatCounter === 0 || (beatsPerMeasure === 4 && beatCounter === 2));
+                    continue;
+                }
 
-                        // CADENTIAL RESOLUTION on last measure
-                        if (isLastMeasure && isFinalBeat) {
-                            // Approach: if we're not adjacent to tonic, step toward it first
-                            currentScaleIdx = tonicIdx;
-                            const pitch = uniquePitchBank[currentScaleIdx];
-                            playbackNotes.push({
-                                note: pitch,
-                                time: timeAccumulator,
-                                duration: remainingBeats
-                            });
+                // РАВНОДЕЛНИ РАЗМЕРИ (2/4, 3/4, 4/4) - КЛАСИЧЕСКИ ПЕРИОД
+                if (isLastMeasure) {
+                    const finalTonicIdx = (Math.abs((tonicIdx + 7) - currentScaleIdx) < Math.abs(tonicIdx - currentScaleIdx))
+                        ? (tonicIdx + 7)
+                        : tonicIdx;
 
-                            const noteChar = midiToABCNote(pitch, key);
-                            if (remainingBeats === 1.0) {
-                                measureAbc += noteChar + " ";
-                            } else if (remainingBeats === 0.5) {
-                                measureAbc += noteChar + "/2 ";
-                            } else if (remainingBeats === 1.5) {
-                                measureAbc += noteChar + "3/2 ";
-                            } else {
-                                measureAbc += noteChar + " ";
-                            }
-
-                            timeAccumulator += remainingBeats;
-                            beatsInMeasure += remainingBeats;
-                            continue;
+                    if (beatsPerMeasure === 2) {
+                        const distToFinal = Math.abs(currentScaleIdx - finalTonicIdx);
+                        if (distToFinal === 1 && rhythms.eighths) {
+                            const n1 = currentScaleIdx;
+                            const n2 = (currentScaleIdx > finalTonicIdx) ? (finalTonicIdx - 1) : (finalTonicIdx + 1);
+                            measureAbc += emitNote(n1, 0.5, "/2", measureAccState, -1);
+                            measureAbc += emitNote(n2, 0.5, "/2 ", measureAccState, 1);
+                            currentScaleIdx = finalTonicIdx;
+                            measureAbc += emitNote(currentScaleIdx, 1.0, " ", measureAccState, 1);
+                        } else if (distToFinal === 1) {
+                            currentScaleIdx = finalTonicIdx;
+                            measureAbc += emitNote(currentScaleIdx, 2.0, "2 ", measureAccState, 1);
+                        } else {
+                            const penultIdx = (currentScaleIdx > finalTonicIdx) ? (finalTonicIdx + 1) : (finalTonicIdx - 1);
+                            measureAbc += emitNote(penultIdx, 1.0, " ", measureAccState, penultIdx < finalTonicIdx ? 1 : -1);
+                            currentScaleIdx = finalTonicIdx;
+                            measureAbc += emitNote(currentScaleIdx, 1.0, " ", measureAccState, 1);
                         }
-
-                        // REST INSERTION: ~12% chance on weak beats (not first beat, not last measure)
-                        if (!isStrongBeat && !isLastMeasure && !isClimaxMeasure && Math.random() < 0.12) {
-                            playbackNotes.push({
-                                note: -1, // rest marker
-                                time: timeAccumulator,
-                                duration: 1.0
-                            });
-                            measureAbc += "z ";
-                            timeAccumulator += 1.0;
-                            beatsInMeasure += 1.0;
-                            beatCounter++;
-                            continue;
+                    } else if (beatsPerMeasure === 3) {
+                        const penultIdx = (currentScaleIdx >= finalTonicIdx) ? (finalTonicIdx + 1) : (finalTonicIdx - 1);
+                        if (rhythms.eighths && Math.random() < 0.65) {
+                            const upper = finalTonicIdx + 1;
+                            const lower = finalTonicIdx - 1;
+                            measureAbc += emitNote(upper, 0.5, "/2", measureAccState, -1);
+                            measureAbc += emitNote(lower, 0.5, "/2 ", measureAccState, 1);
+                        } else {
+                            measureAbc += emitNote(penultIdx, 1.0, " ", measureAccState, penultIdx < finalTonicIdx ? 1 : -1);
                         }
-
-                        // MOTIF REUSE: On even-numbered measures (2, 4, 6...), if we have a motif,
-                        // there's a chance to replay it transposed
-                        let useMotif = false;
-                        if (motifCaptured && m > 0 && m % 2 === 0 && beatCounter === 0 && !isLastMeasure && Math.random() < 0.45) {
-                            useMotif = true;
+                        currentScaleIdx = finalTonicIdx;
+                        measureAbc += emitNote(currentScaleIdx, 2.0, "2 ", measureAccState, 1);
+                    } else {
+                        const upper = finalTonicIdx + 1;
+                        const lower = finalTonicIdx - 1;
+                        if (rhythms.eighths) {
+                            const thirdDeg = finalTonicIdx + 2;
+                            measureAbc += emitNote(thirdDeg, 1.0, " ", measureAccState, -1);
+                            measureAbc += emitNote(upper, 0.5, "/2", measureAccState, -1);
+                            measureAbc += emitNote(lower, 0.5, "/2 ", measureAccState, 1);
+                        } else {
+                            measureAbc += emitNote(upper, 1.0, " ", measureAccState, -1);
+                            measureAbc += emitNote(lower, 1.0, " ", measureAccState, 1);
                         }
+                        currentScaleIdx = finalTonicIdx;
+                        measureAbc += emitNote(currentScaleIdx, 2.0, "2 ", measureAccState, 1);
+                    }
 
-                        if (useMotif && motifPitchOffsets.length > 0 && motifRhythmCells.length > 0) {
-                            // Replay motif transposed from current position
-                            const motifStartIdx = currentScaleIdx;
-                            let motifFits = true;
-                            let motifBeats = 0;
-                            // Check if motif fits in remaining beats
-                            for (const cell of motifRhythmCells) {
-                                if (cell === 'quarter') motifBeats += 1;
-                                else if (cell === 'eighths') motifBeats += 1;
-                                else if (cell === 'dotted') motifBeats += 1;
-                                else motifBeats += 1;
-                            }
-                            if (motifBeats > remainingBeats) motifFits = false;
+                    measuresAbcList.push(measureAbc + "|]");
+                    abcBody += measureAbc + "|] ";
+                    continue;
+                }
 
-                            if (motifFits) {
-                                let pIdx = 0;
-                                for (let mc = 0; mc < motifRhythmCells.length && beatsInMeasure < beatsPerMeasure; mc++) {
-                                    const mCell = motifRhythmCells[mc];
-                                    if (mCell === 'quarter') {
-                                        const newIdx = Math.max(2, Math.min(uniquePitchBank.length - 3, motifStartIdx + (motifPitchOffsets[pIdx] || 0)));
-                                        currentScaleIdx = newIdx;
-                                        const pitch = uniquePitchBank[currentScaleIdx];
-                                        playbackNotes.push({ note: pitch, time: timeAccumulator, duration: 1.0 });
-                                        measureAbc += midiToABCNote(pitch, key) + " ";
-                                        timeAccumulator += 1.0;
-                                        beatsInMeasure += 1.0;
-                                        pIdx++;
-                                    } else if (mCell === 'eighths') {
-                                        for (let ei = 0; ei < 2; ei++) {
-                                            const newIdx = Math.max(2, Math.min(uniquePitchBank.length - 3, motifStartIdx + (motifPitchOffsets[pIdx] || 0)));
-                                            currentScaleIdx = newIdx;
-                                            const pitch = uniquePitchBank[currentScaleIdx];
-                                            playbackNotes.push({ note: pitch, time: timeAccumulator, duration: 0.5 });
-                                            measureAbc += midiToABCNote(pitch, key) + (ei === 0 ? "/2" : "/2 ");
-                                            timeAccumulator += 0.5;
-                                            pIdx++;
-                                        }
-                                        beatsInMeasure += 1.0;
-                                    } else {
-                                        // Default: quarter
-                                        const newIdx = Math.max(2, Math.min(uniquePitchBank.length - 3, motifStartIdx + (motifPitchOffsets[pIdx] || 0)));
-                                        currentScaleIdx = newIdx;
-                                        const pitch = uniquePitchBank[currentScaleIdx];
-                                        playbackNotes.push({ note: pitch, time: timeAccumulator, duration: 1.0 });
-                                        measureAbc += midiToABCNote(pitch, key) + " ";
-                                        timeAccumulator += 1.0;
-                                        beatsInMeasure += 1.0;
-                                        pIdx++;
-                                    }
-                                    beatCounter++;
-                                }
-                                lastStepDelta = 0;
-                                continue;
-                            }
+                if (isHalfCadenceMeasure) {
+                    const hcTargets = [tonicIdx + 4, tonicIdx + 1, tonicIdx - 1];
+                    let hcTarget = hcTargets[0];
+                    let bestDist = 99;
+                    for (const candidate of hcTargets) {
+                        const d = Math.abs(candidate - currentScaleIdx);
+                        if (d > 0 && d < bestDist) {
+                            bestDist = d;
+                            hcTarget = candidate;
                         }
+                    }
 
-                        // Choose rhythmic cell
-                        let cells = ['quarter'];
-                        if (rhythms.eighths) cells.push('eighths');
-                        if (rhythms.sixteenths && (isClimaxMeasure || Math.random() > 0.6)) cells.push('sixteenths');
-                        if (rhythms.dotted) cells.push('dotted');
-                        if (rhythms.triplet && isClimaxMeasure) cells.push('triplet');
-                        if (rhythms.syncopation && remainingBeats >= 2.0) cells.push('syncopation');
-
-                        const cell = cells[Math.floor(Math.random() * cells.length)];
-
-                        // Capture motif from first measure
-                        if (m === 0 && !motifCaptured && beatCounter < 2) {
-                            motifRhythmCells.push(cell);
-                            motifBaseIdx = currentScaleIdx;
+                    if (beatsPerMeasure === 2) {
+                        if (Math.random() < 0.65) {
+                            lastStepDelta = hcTarget - currentScaleIdx;
+                            currentScaleIdx = hcTarget;
+                            measureAbc += emitNote(currentScaleIdx, 2.0, "2 ", measureAccState);
+                        } else {
+                            const prepIdx = hcTarget + 1;
+                            measureAbc += emitNote(prepIdx, 1.0, " ", measureAccState, -1);
+                            currentScaleIdx = hcTarget;
+                            lastStepDelta = -1;
+                            measureAbc += emitNote(currentScaleIdx, 1.0, " ", measureAccState, -1);
                         }
-
-                        const chooseOpts = { chordSymbol: currentChord, key, pitchBank: uniquePitchBank, tonic, isStrongBeat };
-                        if (isVeryFirstNote) {
-                            chooseOpts.forceIdx = tonicIdx + firstNoteOffset;
-                            isVeryFirstNote = false;
+                    } else if (beatsPerMeasure === 3) {
+                        if (Math.random() < 0.5) {
+                            currentScaleIdx = hcTarget;
+                            measureAbc += emitNote(currentScaleIdx, 3.0, "3 ", measureAccState);
+                        } else {
+                            const prepIdx = hcTarget + 1;
+                            measureAbc += emitNote(prepIdx, 1.0, " ", measureAccState, -1);
+                            currentScaleIdx = hcTarget;
+                            measureAbc += emitNote(currentScaleIdx, 2.0, "2 ", measureAccState, -1);
                         }
+                    } else {
+                        const prep1 = hcTarget + 2;
+                        const prep2 = hcTarget + 1;
+                        measureAbc += emitNote(prep1, 1.0, " ", measureAccState, -1);
+                        measureAbc += emitNote(prep2, 1.0, " ", measureAccState, -1);
+                        currentScaleIdx = hcTarget;
+                        lastStepDelta = -1;
+                        measureAbc += emitNote(currentScaleIdx, 2.0, "2 ", measureAccState, -1);
+                    }
 
-                        if (cell === 'quarter') {
-                            const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
+                    measuresAbcList.push(measureAbc + "|");
+                    abcBody += measureAbc + "| ";
+                    continue;
+                }
+
+                if (isConsequentOpening && openingMeasureEvents.length > 0) {
+                    const variationShift = (Math.random() < 0.65) ? 0 : 2;
+                    openingMeasureEvents.forEach(ev => {
+                        const idx = Math.max(2, Math.min(uniquePitchBank.length - 3, ev.scaleIdx + variationShift));
+                        lastStepDelta = idx - currentScaleIdx;
+                        currentScaleIdx = idx;
+                        measureAbc += emitNote(currentScaleIdx, ev.durationBeats, ev.abcSuffix, measureAccState);
+                    });
+                    measuresAbcList.push(measureAbc + "|");
+                    abcBody += measureAbc + "| ";
+                    continue;
+                }
+
+                let beatsInMeasure = 0;
+                let beatCounter = 0;
+
+                while (beatsInMeasure < beatsPerMeasure) {
+                    const remainingBeats = beatsPerMeasure - beatsInMeasure;
+                    const isStrongBeat = (beatCounter === 0 || (beatsPerMeasure === 4 && beatCounter === 2));
+
+                    const cells = ['quarter'];
+                    if (rhythms.eighths) cells.push('eighths', 'eighths');
+                    if (rhythms.dotted && !isStrongBeat && remainingBeats >= 1.0) cells.push('dotted');
+                    if (rhythms.sixteenths && !isStrongBeat) cells.push('sixteenths');
+                    if (rhythms.triplet && !isStrongBeat) cells.push('triplet');
+                    if (rhythms.syncopation && remainingBeats >= 2.0 && beatCounter === 0) cells.push('syncopation');
+
+                    const cell = cells[Math.floor(Math.random() * cells.length)];
+
+                    const baseOpts = {
+                        chordSymbol: isPreCadenceMeasure && beatCounter >= Math.floor(beatsPerMeasure / 2) ? 'V7' : currentChord,
+                        key, pitchBank: uniquePitchBank, tonic, isStrongBeat, scaleType, styleFocus
+                    };
+
+                    if (cell === 'quarter') {
+                        if (!(m === 0 && beatCounter === 0)) {
+                            const nextInfo = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, baseOpts);
                             lastStepDelta = nextInfo.idx - currentScaleIdx;
-                            // Capture motif offset
-                            if (m === 0 && !motifCaptured) {
-                                motifPitchOffsets.push(nextInfo.idx - motifBaseIdx);
-                            }
                             currentScaleIdx = nextInfo.idx;
-
-                            const pitch = uniquePitchBank[currentScaleIdx];
-                            playbackNotes.push({
-                                note: pitch,
-                                time: timeAccumulator,
-                                duration: 1.0
-                            });
-                            measureAbc += midiToABCNote(pitch, key) + " ";
-                            timeAccumulator += 1.0;
-                            beatsInMeasure += 1.0;
-                        } else if (cell === 'eighths') {
-                            const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
-                            const delta1 = n1.idx - currentScaleIdx;
-                            const p1 = uniquePitchBank[n1.idx];
-                            if (m === 0 && !motifCaptured) motifPitchOffsets.push(n1.idx - motifBaseIdx);
-
-                            const n2 = chooseMusicalScaleIdx(n1.idx, tonicIdx, uniquePitchBank.length, leaps, m, length, delta1, { ...chooseOpts, isStrongBeat: false });
-                            lastStepDelta = n2.idx - n1.idx;
-                            const p2 = uniquePitchBank[n2.idx];
-                            currentScaleIdx = n2.idx;
-                            if (m === 0 && !motifCaptured) motifPitchOffsets.push(n2.idx - motifBaseIdx);
-
-                            playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.5 });
-                            playbackNotes.push({ note: p2, time: timeAccumulator + 0.5, duration: 0.5 });
-
-                            measureAbc += `${midiToABCNote(p1, key)}/2${midiToABCNote(p2, key)}/2 `;
-                            timeAccumulator += 1.0;
-                            beatsInMeasure += 1.0;
-                        } else if (cell === 'sixteenths') {
-                            let tempIdx = currentScaleIdx;
-                            let tempDelta = lastStepDelta;
-                            const pitches = [];
-
-                            for (let j = 0; j < 4; j++) {
-                                const n = chooseMusicalScaleIdx(tempIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, tempDelta, { ...chooseOpts, isStrongBeat: j === 0 });
-                                tempDelta = n.idx - tempIdx;
-                                tempIdx = n.idx;
-                                pitches.push(uniquePitchBank[tempIdx]);
-                            }
-                            lastStepDelta = tempDelta;
-                            currentScaleIdx = tempIdx;
-
-                            pitches.forEach((p, j) => {
-                                playbackNotes.push({ note: p, time: timeAccumulator + j * 0.25, duration: 0.25 });
-                            });
-
-                            measureAbc += `${midiToABCNote(pitches[0], key)}/4${midiToABCNote(pitches[1], key)}/4${midiToABCNote(pitches[2], key)}/4${midiToABCNote(pitches[3], key)}/4 `;
-                            timeAccumulator += 1.0;
-                            beatsInMeasure += 1.0;
-                        } else if (cell === 'dotted') {
-                            const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
-                            const delta1 = n1.idx - currentScaleIdx;
-                            const p1 = uniquePitchBank[n1.idx];
-
-                            const n2 = chooseMusicalScaleIdx(n1.idx, tonicIdx, uniquePitchBank.length, leaps, m, length, delta1, { ...chooseOpts, isStrongBeat: false });
-                            lastStepDelta = n2.idx - n1.idx;
-                            const p2 = uniquePitchBank[n2.idx];
-                            currentScaleIdx = n2.idx;
-
-                            playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.75 });
-                            playbackNotes.push({ note: p2, time: timeAccumulator + 0.75, duration: 0.25 });
-
-                            measureAbc += `${midiToABCNote(p1, key)}3/4${midiToABCNote(p2, key)}1/4 `;
-                            timeAccumulator += 1.0;
-                            beatsInMeasure += 1.0;
-                        } else if (cell === 'triplet') {
-                            let tempIdx = currentScaleIdx;
-                            let tempDelta = lastStepDelta;
-                            const pitches = [];
-
-                            for (let j = 0; j < 3; j++) {
-                                const n = chooseMusicalScaleIdx(tempIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, tempDelta, { ...chooseOpts, isStrongBeat: j === 0 });
-                                tempDelta = n.idx - tempIdx;
-                                tempIdx = n.idx;
-                                pitches.push(uniquePitchBank[tempIdx]);
-                            }
-                            lastStepDelta = tempDelta;
-                            currentScaleIdx = tempIdx;
-
-                            pitches.forEach((p, j) => {
-                                playbackNotes.push({ note: p, time: timeAccumulator + j * 0.333, duration: 0.333 });
-                            });
-
-                            measureAbc += `(3${midiToABCNote(pitches[0], key)}/2${midiToABCNote(pitches[1], key)}/2${midiToABCNote(pitches[2], key)}/2 `;
-                            timeAccumulator += 1.0;
-                            beatsInMeasure += 1.0;
-                        } else if (cell === 'syncopation') {
-                            const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, chooseOpts);
-                            const delta1 = n1.idx - currentScaleIdx;
-                            const p1 = uniquePitchBank[n1.idx];
-
-                            const n2 = chooseMusicalScaleIdx(n1.idx, tonicIdx, uniquePitchBank.length, leaps, m, length, delta1, { ...chooseOpts, isStrongBeat: false });
-                            const delta2 = n2.idx - n1.idx;
-                            const p2 = uniquePitchBank[n2.idx];
-
-                            const n3 = chooseMusicalScaleIdx(n2.idx, tonicIdx, uniquePitchBank.length, leaps, m, length, delta2, { ...chooseOpts, isStrongBeat: false });
-                            lastStepDelta = n3.idx - n2.idx;
-                            const p3 = uniquePitchBank[n3.idx];
-                            currentScaleIdx = n3.idx;
-
-                            playbackNotes.push({ note: p1, time: timeAccumulator, duration: 0.5 });
-                            playbackNotes.push({ note: p2, time: timeAccumulator + 0.5, duration: 1.0 });
-                            playbackNotes.push({ note: p3, time: timeAccumulator + 1.5, duration: 0.5 });
-
-                            measureAbc += `${midiToABCNote(p1, key)}/2 ${midiToABCNote(p2, key)} ${midiToABCNote(p3, key)}/2 `;
-                            timeAccumulator += 2.0;
-                            beatsInMeasure += 2.0;
                         }
+                        measureAbc += emitNote(currentScaleIdx, 1.0, " ", measureAccState);
+                        if (m === 0) openingMeasureEvents.push({ scaleIdx: currentScaleIdx, durationBeats: 1.0, abcSuffix: " " });
+                        beatsInMeasure += 1.0;
+
+                    } else if (cell === 'eighths') {
+                        if (!(m === 0 && beatCounter === 0)) {
+                            const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, baseOpts);
+                            lastStepDelta = n1.idx - currentScaleIdx;
+                            currentScaleIdx = n1.idx;
+                        }
+                        measureAbc += emitNote(currentScaleIdx, 0.5, "/2", measureAccState);
+                        if (m === 0) openingMeasureEvents.push({ scaleIdx: currentScaleIdx, durationBeats: 0.5, abcSuffix: "/2" });
+
+                        const n2 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                            ...baseOpts, isStrongBeat: false, subdivisionMode: true
+                        });
+                        lastStepDelta = n2.idx - currentScaleIdx;
+                        currentScaleIdx = n2.idx;
+                        measureAbc += emitNote(currentScaleIdx, 0.5, "/2 ", measureAccState);
+                        if (m === 0) openingMeasureEvents.push({ scaleIdx: currentScaleIdx, durationBeats: 0.5, abcSuffix: "/2 " });
+                        beatsInMeasure += 1.0;
+
+                    } else if (cell === 'sixteenths') {
+                        const patternType = Math.random() < 0.5 ? 'scale_run' : 'neighbor_turn';
+                        const stepDir = (currentScaleIdx > tonicIdx + 4) ? -1 : 1;
+
+                        for (let j = 0; j < 4; j++) {
+                            if (j === 0) {
+                                const n0 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                                    ...baseOpts, subdivisionMode: true
+                                });
+                                lastStepDelta = n0.idx - currentScaleIdx;
+                                currentScaleIdx = n0.idx;
+                            } else if (patternType === 'scale_run') {
+                                const nRun = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, stepDir, {
+                                    ...baseOpts, isStrongBeat: false, subdivisionMode: true
+                                });
+                                lastStepDelta = nRun.idx - currentScaleIdx;
+                                currentScaleIdx = nRun.idx;
+                            } else {
+                                const turnOffsets = [0, 1, -1, 1];
+                                const candidate = Math.max(2, Math.min(uniquePitchBank.length - 3, currentScaleIdx + turnOffsets[j]));
+                                lastStepDelta = candidate - currentScaleIdx;
+                                currentScaleIdx = candidate;
+                            }
+                            const suffix = (j === 3) ? "/4 " : "/4";
+                            measureAbc += emitNote(currentScaleIdx, 0.25, suffix, measureAccState, lastStepDelta);
+                            if (m === 0) openingMeasureEvents.push({ scaleIdx: currentScaleIdx, durationBeats: 0.25, abcSuffix: suffix });
+                        }
+                        beatsInMeasure += 1.0;
+
+                    } else if (cell === 'dotted') {
+                        const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, baseOpts);
+                        lastStepDelta = n1.idx - currentScaleIdx;
+                        currentScaleIdx = n1.idx;
+                        measureAbc += emitNote(currentScaleIdx, 0.75, "3/4", measureAccState);
+                        if (m === 0) openingMeasureEvents.push({ scaleIdx: currentScaleIdx, durationBeats: 0.75, abcSuffix: "3/4" });
+
+                        const n2 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                            ...baseOpts, isStrongBeat: false, subdivisionMode: true
+                        });
+                        lastStepDelta = n2.idx - currentScaleIdx;
+                        currentScaleIdx = n2.idx;
+                        measureAbc += emitNote(currentScaleIdx, 0.25, "/4 ", measureAccState);
+                        if (m === 0) openingMeasureEvents.push({ scaleIdx: currentScaleIdx, durationBeats: 0.25, abcSuffix: "/4 " });
+                        beatsInMeasure += 1.0;
+
+                    } else if (cell === 'triplet') {
+                        for (let j = 0; j < 3; j++) {
+                            const nTrip = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                                ...baseOpts, isStrongBeat: j === 0, subdivisionMode: true
+                            });
+                            lastStepDelta = nTrip.idx - currentScaleIdx;
+                            currentScaleIdx = nTrip.idx;
+                            const prefix = (j === 0) ? "(3" : "";
+                            const suffix = (j === 2) ? "/2 " : "/2";
+                            measureAbc += prefix + emitNote(currentScaleIdx, 1 / 3, suffix, measureAccState);
+                        }
+                        beatsInMeasure += 1.0;
+
+                    } else if (cell === 'syncopation') {
+                        const n1 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, baseOpts);
+                        lastStepDelta = n1.idx - currentScaleIdx;
+                        currentScaleIdx = n1.idx;
+                        measureAbc += emitNote(currentScaleIdx, 0.5, "/2 ", measureAccState);
+
+                        const n2 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                            ...baseOpts, isStrongBeat: true
+                        });
+                        lastStepDelta = n2.idx - currentScaleIdx;
+                        currentScaleIdx = n2.idx;
+                        measureAbc += emitNote(currentScaleIdx, 1.0, " ", measureAccState);
+
+                        const n3 = chooseMusicalScaleIdx(currentScaleIdx, tonicIdx, uniquePitchBank.length, leaps, m, length, lastStepDelta, {
+                            ...baseOpts, isStrongBeat: false, subdivisionMode: true
+                        });
+                        lastStepDelta = n3.idx - currentScaleIdx;
+                        currentScaleIdx = n3.idx;
+                        measureAbc += emitNote(currentScaleIdx, 0.5, "/2 ", measureAccState);
+                        beatsInMeasure += 2.0;
                         beatCounter++;
                     }
-                    // Mark motif as captured after first measure
-                    if (m === 0) motifCaptured = true;
-                    abcBody += measureAbc + "| ";
+
+                    beatCounter++;
                 }
+
+                measuresAbcList.push(measureAbc + "|");
+                abcBody += measureAbc + "| ";
             }
+
+            // Build student 1st-measure clue ABC (shows 1st measure + blank rests for remaining measures)
+            const restUnit = isUneven ? `z${Math.round(beatsPerMeasure * 2)}` : `z${beatsPerMeasure}`;
+            const clueMeasures = measuresAbcList.map((mStr, idx) => idx === 0 ? mStr : `${restUnit} |`);
+            const clueAbc = abcHeader + clueMeasures.join(' ') + ']';
 
             return {
                 type: 'melodic',
                 key: key,
+                scaleType: scaleType,
                 meter: meter,
+                length: length,
                 beatsPerMeasure: beatsPerMeasure,
-                playbackNotes: playbackNotes.filter(n => n.note !== -1), // Remove rest markers from playback
-                abc: abcHeader + abcBody
+                harmony: harmony,
+                playbackNotes: playbackNotes.filter(n => n.note !== -1),
+                abc: abcHeader + abcBody,
+                clueAbc: clueAbc
             };
         }
 
         // ================= MUSICAL VOICE LEADING & CONTOUR CONTROLLER =================
         function chooseMusicalScaleIdx(currIdx, tonicIdx, bankLength, leaps, measureIdx, totalMeasures, lastStepDelta, options = {}) {
             if (options.forceIdx !== undefined) {
-                const forced = options.forceIdx;
+                const forced = Math.max(2, Math.min(bankLength - 3, options.forceIdx));
                 delete options.forceIdx;
                 return { idx: forced };
             }
-            const { chordSymbol, key, pitchBank, tonic, isStrongBeat, phrasePosition } = options;
-            const progressRatio = measureIdx / Math.max(1, totalMeasures - 1);
-            const isClimaxPhase = (progressRatio >= 0.5 && progressRatio <= 0.8);
-            const isCadencePhase = (progressRatio > 0.8);
 
+            const {
+                chordSymbol = 'I',
+                key = 'C',
+                pitchBank,
+                tonic = 60,
+                isStrongBeat = false,
+                scaleType = 'natural',
+                subdivisionMode = false,
+                styleFocus = null
+            } = options;
+
+            const isMinor = key.includes('m');
+            const currDegree = ((currIdx - tonicIdx) % 7 + 7) % 7;
             const possibleOffsets = [];
 
-            // 1. TENDENCY TONE RESOLUTION (7→1, 4→3)
-            if (pitchBank && tonic) {
-                const pitch = pitchBank[currIdx];
-                const relPitch = ((pitch - tonic) % 12 + 12) % 12;
-                const scale = SCALE_STEPS[key] || SCALE_STEPS['C'];
-                // Leading tone (degree 7) → resolve up to tonic
-                if (relPitch === 11 || (scale.includes(11) && relPitch === 11)) {
-                    possibleOffsets.push({ val: 1, weight: 150 });
-                    possibleOffsets.push({ val: -1, weight: 20 });
-                    return finalize(currIdx, possibleOffsets, bankLength);
-                }
-                // Scale degree 4 → tend to resolve down to 3
-                if (relPitch === 5) { // perfect 4th above tonic
-                    possibleOffsets.push({ val: -1, weight: 100 });
-                    possibleOffsets.push({ val: 1, weight: 40 });
-                    possibleOffsets.push({ val: 0, weight: 20 });
-                }
-            }
-
-            // Strict Non-chord tone resolution: passing tones resolve by step to a chord tone on strong beats
-            if (isStrongBeat && chordSymbol && pitchBank && tonic) {
-                const isCurrChordTone = isChordTone(currIdx, chordSymbol, key, pitchBank, tonic);
-                if (!isCurrChordTone) {
-                    for (let off of [-1, 1]) {
-                        const testIdx = currIdx + off;
-                        if (testIdx >= 0 && testIdx < bankLength && isChordTone(testIdx, chordSymbol, key, pitchBank, tonic)) {
-                            possibleOffsets.push({ val: off, weight: 200 });
-                        }
-                    }
-                    if (possibleOffsets.length > 0) return finalize(currIdx, possibleOffsets, bankLength);
-                }
-            }
-
-            // 2. LEAP COMPENSATION & ARPEGGIATION RULE
-            if (lastStepDelta >= 2) {
-                possibleOffsets.push({ val: -1, weight: 130 });
-                possibleOffsets.push({ val: -2, weight: 70 });
-                possibleOffsets.push({ val: 0, weight: 10 });
-                // Arpeggiation (Скрита полифония) - Allow inversions (sextachord, quart-sextachord)
-                for (let off of [2, 3]) {
-                    if ((off === 2 && leaps.third) || (off === 3 && leaps.fourthFifth)) {
-                        const testIdx = currIdx + off;
-                        if (testIdx < bankLength) {
-                            const isCT = (chordSymbol && pitchBank && tonic) ? isChordTone(testIdx, chordSymbol, key, pitchBank, tonic) : false;
-                            possibleOffsets.push({ val: off, weight: isCT ? 90 : 10 });
-                        }
-                    }
-                }
-            } else if (lastStepDelta <= -2) {
-                possibleOffsets.push({ val: 1, weight: 130 });
-                possibleOffsets.push({ val: 2, weight: 70 });
-                possibleOffsets.push({ val: 0, weight: 10 });
-                // Arpeggiation (Скрита полифония) - Allow inversions (sextachord, quart-sextachord)
-                for (let off of [-2, -3]) {
-                    if ((off === -2 && leaps.third) || (off === -3 && leaps.fourthFifth)) {
-                        const testIdx = currIdx + off;
-                        if (testIdx >= 0) {
-                            const isCT = (chordSymbol && pitchBank && tonic) ? isChordTone(testIdx, chordSymbol, key, pitchBank, tonic) : false;
-                            possibleOffsets.push({ val: off, weight: isCT ? 90 : 10 });
-                        }
-                    }
-                }
-            } else if (possibleOffsets.length === 0) {
-                // 3. STRONG BEAT → favor chord tones
-                if (isStrongBeat && chordSymbol && pitchBank && tonic) {
-                    // Try offsets -3 to +3 and heavily weight chord tones
-                    for (let off = -3; off <= 3; off++) {
-                        const testIdx = currIdx + off;
-                        if (testIdx < 2 || testIdx >= bankLength - 2) continue;
-                        const isChord = isChordTone(testIdx, chordSymbol, key, pitchBank, tonic);
-                        if (off === 0) {
-                            possibleOffsets.push({ val: off, weight: isChord ? 40 : 5 });
-                        } else if (Math.abs(off) === 1) {
-                            possibleOffsets.push({ val: off, weight: isChord ? 80 : 25 });
-                        } else if (Math.abs(off) === 2) {
-                            if (leaps.third) possibleOffsets.push({ val: off, weight: isChord ? 60 : 15 });
-                        } else if (Math.abs(off) === 3) {
-                            if (leaps.fourthFifth) possibleOffsets.push({ val: off, weight: isChord ? 40 : 8 });
-                        }
-                    }
+            if (subdivisionMode) {
+                if (currDegree === 6) {
+                    possibleOffsets.push({ val: 1, weight: 180 });
+                    possibleOffsets.push({ val: -1, weight: scaleType === 'harmonic' ? 15 : 70 });
+                } else if (currDegree === 5 && scaleType === 'harmonic') {
+                    possibleOffsets.push({ val: -1, weight: 200 });
                 } else {
-                    // 4. MELODIC CONTOUR DIRECTIVES
-                    if (measureIdx === 0) {
-                        const distFromTonic = currIdx - tonicIdx;
-                        if (distFromTonic > 2) possibleOffsets.push({ val: -1, weight: 80 });
-                        else if (distFromTonic < -1) possibleOffsets.push({ val: 1, weight: 80 });
-                        else {
-                            possibleOffsets.push({ val: 1, weight: 60 });
-                            possibleOffsets.push({ val: 2, weight: 40 });
-                            possibleOffsets.push({ val: -1, weight: 40 });
-                        }
-                    } else if (isClimaxPhase) {
-                        possibleOffsets.push({ val: 1, weight: 90 });
-                        possibleOffsets.push({ val: 2, weight: 60 });
-                        possibleOffsets.push({ val: -1, weight: 20 });
-                        if (leaps.third) possibleOffsets.push({ val: 2, weight: 40 });
-                        if (leaps.fourthFifth) possibleOffsets.push({ val: 3, weight: 30 });
-                    } else if (isCadencePhase) {
-                        const distFromTonic = currIdx - tonicIdx;
-                        if (distFromTonic > 0) {
-                            possibleOffsets.push({ val: -1, weight: 100 });
-                            possibleOffsets.push({ val: -2, weight: 50 });
-                        } else if (distFromTonic < 0) {
-                            possibleOffsets.push({ val: 1, weight: 100 });
-                            possibleOffsets.push({ val: 2, weight: 50 });
-                        } else {
-                            possibleOffsets.push({ val: 1, weight: 50 });
-                            possibleOffsets.push({ val: -1, weight: 50 });
-                        }
-                    } else {
-                        possibleOffsets.push({ val: 1, weight: 60 });
-                        possibleOffsets.push({ val: -1, weight: 50 });
-                        possibleOffsets.push({ val: 0, weight: 15 });
-                        if (leaps.third) {
-                            possibleOffsets.push({ val: 2, weight: 25 });
-                            possibleOffsets.push({ val: -2, weight: 20 });
-                        }
-                        if (leaps.fourthFifth) {
-                            possibleOffsets.push({ val: 3, weight: 15 });
-                            possibleOffsets.push({ val: -3, weight: 10 });
+                    const continueDir = lastStepDelta > 0 ? 1 : (lastStepDelta < 0 ? -1 : 1);
+                    possibleOffsets.push({ val: continueDir, weight: 130 });
+                    possibleOffsets.push({ val: -continueDir, weight: 90 });
+
+                    if (leaps && leaps.third && styleFocus === 'enclosures') {
+                        for (const off of [-2, 2]) {
+                            const targetDeg = ((currIdx + off - tonicIdx) % 7 + 7) % 7;
+                            if ([0, 2, 4].includes(targetDeg)) {
+                                possibleOffsets.push({ val: off, weight: 45 });
+                            }
                         }
                     }
                 }
+                return finalizeScaleChoice(currIdx, possibleOffsets, tonicIdx, bankLength, scaleType);
             }
 
-            // Fallback if no offsets generated
+            if (currDegree === 6) {
+                possibleOffsets.push({ val: 1, weight: 220 });
+                if (scaleType !== 'harmonic') {
+                    possibleOffsets.push({ val: -1, weight: 45 });
+                }
+                return finalizeScaleChoice(currIdx, possibleOffsets, tonicIdx, bankLength, scaleType);
+            }
+
+            if (currDegree === 5 && (scaleType === 'harmonic' || scaleType === 'biharmonic')) {
+                possibleOffsets.push({ val: -1, weight: 190 });
+                if (leaps && leaps.third) possibleOffsets.push({ val: -2, weight: 50 });
+                return finalizeScaleChoice(currIdx, possibleOffsets, tonicIdx, bankLength, scaleType);
+            }
+
+            if (Math.abs(lastStepDelta) >= 2) {
+                const oppStep = lastStepDelta > 0 ? -1 : 1;
+                possibleOffsets.push({ val: oppStep, weight: 160 });
+
+                const sameDirThird = lastStepDelta > 0 ? 2 : -2;
+                const sameDirFourth = lastStepDelta > 0 ? 3 : -3;
+                if (leaps && leaps.third && isChordTone(currIdx + sameDirThird, chordSymbol, key, pitchBank, tonic)) {
+                    possibleOffsets.push({ val: sameDirThird, weight: 85 });
+                }
+                if (leaps && leaps.fourthFifth && isChordTone(currIdx + sameDirFourth, chordSymbol, key, pitchBank, tonic)) {
+                    possibleOffsets.push({ val: sameDirFourth, weight: 65 });
+                }
+                return finalizeScaleChoice(currIdx, possibleOffsets, tonicIdx, bankLength, scaleType);
+            }
+
+            for (let off = -7; off <= 7; off++) {
+                if (off === 0) {
+                    possibleOffsets.push({ val: 0, weight: isStrongBeat ? 8 : 5 });
+                    continue;
+                }
+                const absOff = Math.abs(off);
+                const testIdx = currIdx + off;
+                if (testIdx < 2 || testIdx >= bankLength - 2) continue;
+
+                if (absOff === 2 && !leaps.third) continue;
+                if ((absOff === 3 || absOff === 4) && !leaps.fourthFifth) continue;
+                if ((absOff === 5 || absOff === 6) && !leaps.sixthSeventh) continue;
+                if (absOff === 7 && !leaps.octave) continue;
+
+                const targetDeg = ((testIdx - tonicIdx) % 7 + 7) % 7;
+
+                if ((scaleType === 'harmonic' || scaleType === 'biharmonic') && absOff === 1) {
+                    if ((currDegree === 5 && targetDeg === 6) || (currDegree === 6 && targetDeg === 5)) {
+                        continue;
+                    }
+                }
+                if (scaleType === 'biharmonic' && absOff === 1 && !isMinor) {
+                    if ((currDegree === 1 && targetDeg === 2) || (currDegree === 2 && targetDeg === 1)) {
+                        continue;
+                    }
+                }
+
+                const targetIsChordTone = isChordTone(testIdx, chordSymbol, key, pitchBank, tonic);
+                let weight = 10;
+
+                if (absOff === 1) {
+                    weight = targetIsChordTone ? 110 : 75;
+                } else if (absOff === 2) {
+                    weight = targetIsChordTone ? 85 : 20;
+                    if (styleFocus === 'triad_and_steps' && targetIsChordTone) weight += 50;
+                } else if (absOff === 3 || absOff === 4) {
+                    const isMainLeap = ([0, 3, 4].includes(currDegree) && [0, 3, 4].includes(targetDeg));
+                    weight = (targetIsChordTone && isMainLeap) ? 65 : 5;
+                    if (styleFocus === 'fourth_fifth_leaps' && isMainLeap) weight += 75;
+                } else if (absOff === 5 || absOff === 6) {
+                    weight = targetIsChordTone ? 30 : 2;
+                } else if (absOff === 7) {
+                    weight = (targetDeg === 0 || targetDeg === 4) ? 25 : 1;
+                }
+
+                const distFromTonic = testIdx - tonicIdx;
+                if (distFromTonic > 6 && off > 0) weight *= 0.3;
+                if (distFromTonic < -3 && off < 0) weight *= 0.3;
+
+                possibleOffsets.push({ val: off, weight });
+            }
+
             if (possibleOffsets.length === 0) {
-                possibleOffsets.push({ val: 1, weight: 50 });
-                possibleOffsets.push({ val: -1, weight: 50 });
+                possibleOffsets.push({ val: currIdx > tonicIdx ? -1 : 1, weight: 100 });
             }
 
-            return finalize(currIdx, possibleOffsets, bankLength);
+            return finalizeScaleChoice(currIdx, possibleOffsets, tonicIdx, bankLength, scaleType);
         }
 
-        function finalize(currIdx, possibleOffsets, bankLength) {
+        function finalizeScaleChoice(currIdx, possibleOffsets, tonicIdx, bankLength, scaleType) {
             let totalWeight = possibleOffsets.reduce((sum, item) => sum + item.weight, 0);
             let rand = Math.random() * totalWeight;
             let chosenOffset = 1;
@@ -1691,6 +2199,12 @@
             let nextIdx = currIdx + chosenOffset;
             if (nextIdx < 2) nextIdx = 2;
             if (nextIdx >= bankLength - 2) nextIdx = bankLength - 3;
+
+            const d1 = ((currIdx - tonicIdx) % 7 + 7) % 7;
+            const d2 = ((nextIdx - tonicIdx) % 7 + 7) % 7;
+            if ((scaleType === 'harmonic' || scaleType === 'biharmonic') && ((d1 === 5 && d2 === 6) || (d1 === 6 && d2 === 5))) {
+                nextIdx = d1 === 5 ? currIdx - 1 : currIdx + 1;
+            }
 
             return { idx: nextIdx };
         }
@@ -1823,51 +2337,186 @@
             };
         }
 
-        // Convert MIDI note number to ABC Notation format
-        function midiToABCNote(midi, key = 'C') {
-            const noteNames = ["C", "^C", "D", "^D", "E", "F", "^F", "G", "^G", "A", "^A", "B"];
-            const index = midi % 12;
-            const octave = Math.floor(midi / 12) - 1;
+        // Convert MIDI note number to ABC Notation format (Dr. Eleonora's Key-Aware Engine)
+        function midiToABCNote(midi, key = 'C', scaleType = 'natural', measureAccidentalState = null) {
+            const theory = KEY_SIGNATURE_THEORY[key] || KEY_SIGNATURE_THEORY['C'];
+            const pitchClass = ((midi % 12) + 12) % 12;
+            const tonicClass = ((theory.tonic % 12) + 12) % 12;
+            const relSemitone = ((pitchClass - tonicClass) + 12) % 12;
 
-            let name = noteNames[index];
-            if (['F', 'Bb', 'Eb', 'Gm', 'Dm'].includes(key)) {
-                const flatNoteNames = ["C", "_D", "D", "_E", "E", "F", "_G", "G", "_A", "A", "_B", "B"];
-                name = flatNoteNames[index];
+            let degreeIndex = 0;
+            if (theory.isMinor) {
+                const minorDegreeMap = {
+                    0: 0, 1: 1, 2: 1, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 5, 9: 5, 10: 6, 11: 6
+                };
+                degreeIndex = minorDegreeMap[relSemitone] ?? 0;
+            } else {
+                const majorDegreeMap = {
+                    0: 0, 1: 1, 2: 1, 3: 2, 4: 2, 5: 3, 6: 3, 7: 4, 8: 5, 9: 5, 10: 6, 11: 6
+                };
+                degreeIndex = majorDegreeMap[relSemitone] ?? 0;
             }
 
-            if (octave === 3) return name + ",";
-            else if (octave === 4) return name;
-            else if (octave === 5) return name.toLowerCase();
-            else if (octave === 6) return name.toLowerCase() + "'";
-            return name;
+            const letterIdx = (theory.tonicLetterIdx + degreeIndex) % 7;
+            const letter = DIATONIC_LETTERS[letterIdx];
+            const naturalSemitone = NATURAL_LETTER_SEMITONES[letter];
+
+            let actualAlteration = pitchClass - naturalSemitone;
+            if (actualAlteration > 6) actualAlteration -= 12;
+            if (actualAlteration < -6) actualAlteration += 12;
+
+            const cleanMidi = midi - actualAlteration;
+            const octave = Math.floor(cleanMidi / 12) - 1;
+
+            const sigAlt = theory.sigAccidentals[letter] || 0;
+            const activeAlt = (measureAccidentalState && measureAccidentalState[letter] !== undefined)
+                ? measureAccidentalState[letter]
+                : sigAlt;
+
+            let accidentalPrefix = "";
+            if (actualAlteration !== activeAlt) {
+                if (actualAlteration === 0) accidentalPrefix = "=";
+                else if (actualAlteration === 1) accidentalPrefix = "^";
+                else if (actualAlteration === 2) accidentalPrefix = "^^";
+                else if (actualAlteration === -1) accidentalPrefix = "_";
+                else if (actualAlteration === -2) accidentalPrefix = "__";
+
+                if (measureAccidentalState) {
+                    measureAccidentalState[letter] = actualAlteration;
+                }
+            }
+
+            let abcLetter = letter;
+            let octaveSuffix = "";
+            if (octave <= 2) {
+                abcLetter = letter.toUpperCase();
+                octaveSuffix = ",,";
+            } else if (octave === 3) {
+                abcLetter = letter.toUpperCase();
+                octaveSuffix = ",";
+            } else if (octave === 4) {
+                abcLetter = letter.toUpperCase();
+            } else if (octave === 5) {
+                abcLetter = letter.toLowerCase();
+            } else if (octave >= 6) {
+                abcLetter = letter.toLowerCase();
+                octaveSuffix = "'".repeat(octave - 5);
+            }
+
+            return `${accidentalPrefix}${abcLetter}${octaveSuffix}`;
         }
 
-        // ================= INTERACTIVE CONTROLS =================
-        function playCurrentDictation() {
-            stopAudio();
+        // ================= ACCOMPANIMENT & HUMANIZED PLAYBACK CONTROLS =================
+        function getAccompanimentChordMidi(key, chordSymbol) {
+            const tonic = KEY_TONICS[key] || 60;
+            const isMinor = key.includes('m');
+            const scale = isMinor ? [0, 2, 3, 5, 7, 8, 11] : [0, 2, 4, 5, 7, 9, 11];
+            const mode = isMinor ? 'minor' : 'major';
+            const degrees = (CHORD_TONES[mode] && CHORD_TONES[mode][chordSymbol]) ? CHORD_TONES[mode][chordSymbol] : [0, 2, 4];
+
+            const baseRoot = tonic - 12;
+            return degrees.map((deg, idx) => {
+                let semitone = scale[deg % 7] || 0;
+                if (isMinor && (chordSymbol === 'V' || chordSymbol === 'V7') && deg === 6) {
+                    semitone = 11;
+                }
+                let midi = baseRoot + semitone;
+                if (idx > 0 && midi < baseRoot + 3) midi += 12;
+                return midi;
+            });
+        }
+
+        function scheduleDictationAccompaniment(dictation, startTime, beatDuration, synth, measureStartIdx = 0, measureEndIdx = null) {
+            const length = dictation.length || parseInt(document.getElementById('dict-length').value) || 4;
+            const harmony = dictation.harmony || getHarmonicProgression(dictation.key, length);
+            const bpm = dictation.beatsPerMeasure;
+            const accSynth = (synth === 'violin' || synth === 'sine' || synth === 'bell') ? 'piano' : synth;
+            const endM = measureEndIdx !== null ? measureEndIdx : harmony.length;
+            const timeOffsetBeats = measureStartIdx * bpm;
+
+            for (let m = measureStartIdx; m < endM; m++) {
+                const chordSymbol = harmony[m];
+                const chordNotes = getAccompanimentChordMidi(dictation.key, chordSymbol);
+                const measureStart = startTime + (m * bpm - timeOffsetBeats) * beatDuration;
+                const measureDur = bpm * beatDuration;
+
+                if (['5/8', '7/8', '9/8', '11/8'].includes(dictation.meter)) {
+                    playTone(chordNotes[0] - 12, measureDur * 0.45, measureStart, accSynth, 0.36, 'tenuto');
+                    chordNotes.forEach(n => {
+                        playTone(n, measureDur * 0.45, measureStart + measureDur * 0.45, accSynth, 0.28, 'staccato');
+                    });
+                } else if (dictation.meter === '3/4' || dictation.meter === '3/8') {
+                    playTone(chordNotes[0] - 12, beatDuration * 0.9, measureStart, accSynth, 0.36, 'tenuto');
+                    chordNotes.slice(1).forEach(n => {
+                        playTone(n, beatDuration * 0.7, measureStart + beatDuration, accSynth, 0.24, 'staccato');
+                        playTone(n, beatDuration * 0.7, measureStart + 2 * beatDuration, accSynth, 0.22, 'staccato');
+                    });
+                } else {
+                    playTone(chordNotes[0] - 12, measureDur * 0.92, measureStart, accSynth, 0.34, 'legato');
+                    chordNotes.forEach((n, idx) => {
+                        playTone(n, measureDur * 0.88, measureStart + idx * 0.012, accSynth, 0.25, 'legato');
+                    });
+                }
+            }
+        }
+
+        function playCurrentDictation(skipStop = false) {
+            if (!skipStop) stopAudio();
             if (!currentDictation) return;
 
+            initAudio();
             const synth = document.getElementById('dict-synth').value;
             const tempo = parseInt(document.getElementById('dict-tempo-val').value) || 80;
             const beatDuration = 60 / tempo;
-            const now = audioCtx ? audioCtx.currentTime : 0.1;
+            const now = audioCtx.currentTime;
 
-            let startTime = now + 0.2;
+            let startTime = now + 0.15;
 
-            // Metronome Count-in
             if (document.getElementById('dict-metronome-click').checked) {
                 const countBeats = Math.ceil(currentDictation.beatsPerMeasure);
                 for (let i = 0; i < countBeats; i++) {
-                    playClick(startTime + i * beatDuration, 1000);
+                    playClick(startTime + i * beatDuration, i === 0 ? 1150 : 850);
                 }
                 startTime += countBeats * beatDuration;
             }
 
             if (currentDictation.type === 'melodic') {
-                currentDictation.playbackNotes.forEach(item => {
-                    const noteTime = startTime + item.time * beatDuration;
+                const totalNotes = currentDictation.playbackNotes.length;
+                const bpm = currentDictation.beatsPerMeasure;
+
+                const accCheckbox = document.getElementById('dict-accompaniment');
+                if (accCheckbox && accCheckbox.checked) {
+                    scheduleDictationAccompaniment(currentDictation, startTime, beatDuration, synth);
+                }
+
+                currentDictation.playbackNotes.forEach((item, idx) => {
+                    const posInMeasure = (item.time % bpm);
+                    const isDownbeat = Math.abs(posInMeasure) < 0.05;
+                    const isSecondaryStrong = (bpm === 4 && Math.abs(posInMeasure - 2) < 0.05);
+
+                    const phraseRatio = idx / Math.max(1, totalNotes - 1);
+                    const phraseCurve = phraseRatio < 0.7
+                        ? 0.72 + (phraseRatio / 0.7) * 0.20
+                        : 0.92 - ((phraseRatio - 0.7) / 0.3) * 0.18;
+
+                    let velocity = phraseCurve;
+                    if (isDownbeat) velocity += 0.12;
+                    else if (isSecondaryStrong) velocity += 0.06;
+                    else velocity -= 0.05;
+
+                    velocity += (Math.random() - 0.5) * 0.04;
+                    const humanTimingOffset = isDownbeat ? 0 : (Math.random() - 0.5) * 0.008;
+
+                    let articulation = 'normal';
+                    if (item.duration >= 1.5 || synth === 'violin' || synth === 'organ') {
+                        articulation = 'legato';
+                    } else if (item.duration <= 0.25) {
+                        articulation = 'tenuto';
+                    }
+
+                    const noteTime = startTime + item.time * beatDuration + humanTimingOffset;
                     const noteDur = item.duration * beatDuration;
-                    playTone(item.note, noteDur, noteTime, synth);
+                    playTone(item.note, noteDur, noteTime, synth, velocity, articulation);
                 });
             } else {
                 currentDictation.playbackClicks.forEach(item => {
@@ -1877,39 +2526,140 @@
             }
         }
 
-        function playTuning() {
+        // Play 1st or 2nd half of the period (Antecedent / Consequent)
+        function playPhraseHalf(halfNum, skipStop = false) {
+            if (!skipStop) stopAudio();
+            if (!currentDictation || currentDictation.type !== 'melodic') {
+                playCurrentDictation(skipStop);
+                return;
+            }
+
+            initAudio();
+            const synth = document.getElementById('dict-synth').value;
+            const tempo = parseInt(document.getElementById('dict-tempo-val').value) || 80;
+            const beatDuration = 60 / tempo;
+            const length = currentDictation.length || parseInt(document.getElementById('dict-length').value) || 4;
+            const bpm = currentDictation.beatsPerMeasure;
+            const halfMeasures = Math.floor(length / 2);
+
+            const mStart = (halfNum === 1) ? 0 : halfMeasures;
+            const mEnd = (halfNum === 1) ? halfMeasures : length;
+            const beatStart = mStart * bpm;
+            const beatEnd = mEnd * bpm;
+
+            let startTime = audioCtx.currentTime + 0.15;
+            if (document.getElementById('dict-metronome-click').checked) {
+                const countBeats = Math.ceil(bpm);
+                for (let i = 0; i < countBeats; i++) {
+                    playClick(startTime + i * beatDuration, i === 0 ? 1150 : 850);
+                }
+                startTime += countBeats * beatDuration;
+            }
+
+            const accCheckbox = document.getElementById('dict-accompaniment');
+            if (accCheckbox && accCheckbox.checked) {
+                scheduleDictationAccompaniment(currentDictation, startTime, beatDuration, synth, mStart, mEnd);
+            }
+
+            const notesInHalf = currentDictation.playbackNotes.filter(n => n.time >= beatStart - 0.01 && n.time < beatEnd - 0.01);
+            notesInHalf.forEach((item) => {
+                const relBeat = item.time - beatStart;
+                const posInMeasure = (relBeat % bpm);
+                const isDownbeat = Math.abs(posInMeasure) < 0.05;
+                const velocity = isDownbeat ? 0.88 : 0.74;
+                const articulation = (item.duration >= 1.5 || synth === 'violin' || synth === 'organ') ? 'legato' : 'normal';
+                playTone(item.note, item.duration * beatDuration, startTime + relBeat * beatDuration, synth, velocity, articulation);
+            });
+        }
+
+        // Teacher Classroom Autopilot Cycle
+        function startTeacherDictationCycle() {
             stopAudio();
+            if (!currentDictation) return;
+            initAudio();
+
+            const bar = document.getElementById('autopilot-status-bar');
+            const text = document.getElementById('autopilot-status-text');
+            if (bar) bar.classList.remove('hidden');
+
+            const tempo = parseInt(document.getElementById('dict-tempo-val').value) || 80;
+            const beatDuration = 60 / tempo;
+            const length = currentDictation.length || parseInt(document.getElementById('dict-length').value) || 4;
+            const fullDictDurMs = (length + 1) * currentDictation.beatsPerMeasure * beatDuration * 1000 + 1500;
+            const halfDictDurMs = (Math.floor(length / 2) + 1) * currentDictation.beatsPerMeasure * beatDuration * 1000 + 1500;
+            const pauseMs = 6000;
+
+            // Step 1: Tuning Cadence
+            if (text) text.innerText = "🎓 Автопилот (Етап 1/5): 🎹 Настройка в тоналността (T – S – D – T)...";
+            playTuning(true);
+
+            // Step 2: First full playthrough
+            const t1 = setTimeout(() => {
+                if (text) text.innerText = "🎓 Автопилот (Етап 2/5): ▶️ Първо цялостно прослушване (Запознаване с мелодията)...";
+                playCurrentDictation(true);
+            }, 4200);
+            activeTimeouts.push(t1);
+
+            // Step 3: Antecedent (Question)
+            const t2 = setTimeout(() => {
+                if (text) text.innerText = "🎓 Автопилот (Етап 3/5): 1️⃣ Изсвирване на I полуизречение (Въпрос ➔ Полукаденца)...";
+                playPhraseHalf(1, true);
+            }, 4200 + fullDictDurMs + pauseMs);
+            activeTimeouts.push(t2);
+
+            // Step 4: Consequent (Answer)
+            const t3 = setTimeout(() => {
+                if (text) text.innerText = "🎓 Автопилот (Етап 4/5): 2️⃣ Изсвирване на II полуизречение (Отговор ➔ Пълна каденца)...";
+                playPhraseHalf(2, true);
+            }, 4200 + fullDictDurMs + pauseMs + halfDictDurMs + pauseMs);
+            activeTimeouts.push(t3);
+
+            // Step 5: Final check playthrough
+            const t4 = setTimeout(() => {
+                if (text) text.innerText = "🎓 Автопилот (Етап 5/5): ✨ Финално контролно прослушване на цялата диктовка!";
+                playCurrentDictation(true);
+            }, 4200 + fullDictDurMs + pauseMs + halfDictDurMs * 2 + pauseMs * 2);
+            activeTimeouts.push(t4);
+
+            const tEnd = setTimeout(() => {
+                if (text) text.innerText = "✅ Цикълът за диктовка завърши! Можете да разкриете нотите на дъската за проверка.";
+            }, 4200 + fullDictDurMs * 2 + halfDictDurMs * 2 + pauseMs * 2 + 1000);
+            activeTimeouts.push(tEnd);
+        }
+
+        function playTuning(skipStop = false) {
+            if (!skipStop) stopAudio();
             if (!currentDictation || currentDictation.type !== 'melodic') return;
 
+            initAudio();
             const key = currentDictation.key;
             const baseNote = KEY_TONICS[key] || 60;
             const isMinor = key.includes('m');
             const synth = document.getElementById('dict-synth').value;
 
-            const now = audioCtx ? audioCtx.currentTime : 0.1;
+            const now = audioCtx.currentTime + 0.1;
 
-            // I - IV - V - I cadence (adapted for major/minor)
             let chordIntervals;
             if (isMinor) {
                 chordIntervals = [
-                    [0, 3, 7],   // i (minor)
-                    [0, 5, 8],   // iv (minor, root position approx)
-                    [-1, 2, 7],  // V (major - dominant is always major in minor keys)
-                    [0, 3, 7]    // i (minor)
+                    [0, 3, 7],   // i
+                    [0, 5, 8],   // iv64
+                    [-1, 2, 7],  // D6
+                    [0, 3, 7]    // i
                 ];
             } else {
                 chordIntervals = [
-                    [0, 4, 7],   // I (major)
-                    [0, 5, 9],   // IV (major)
-                    [-1, 2, 7],  // V (major)
-                    [0, 4, 7]    // I (major)
+                    [0, 4, 7],   // I
+                    [0, 5, 9],   // IV64
+                    [-1, 2, 7],  // D6
+                    [0, 4, 7]    // I
                 ];
             }
 
             chordIntervals.forEach((chord, stepIdx) => {
-                const chordTime = now + stepIdx * 0.8;
+                const chordTime = now + stepIdx * 0.85;
                 chord.forEach(interval => {
-                    playTone(baseNote + interval, 0.7, chordTime, synth);
+                    playTone(baseNote + interval, 0.75, chordTime, synth, 0.78, 'legato');
                 });
             });
         }
@@ -1932,6 +2682,29 @@
         function renderEditedABC() {
             const abc = document.getElementById('dictation-abc-editor').value;
             renderNotation('dictation-notation-render', abc);
+        }
+
+        function toggleFirstMeasureClue() {
+            if (!currentDictation || !currentDictation.clueAbc) return;
+            const container = document.getElementById('dictation-notation-container');
+            const clueBtn = document.getElementById('btn-clue-mode');
+            container.classList.remove('hidden');
+            isNotesVisible = true;
+            document.getElementById('btn-toggle-notes').innerText = "👁️ Скрий Нотите (за ученици)";
+
+            if (!isClueMode) {
+                renderNotation('dictation-notation-render', currentDictation.clueAbc);
+                clueBtn.innerText = "🔓 Разкрий всички тактове";
+                isClueMode = true;
+            } else {
+                renderNotation('dictation-notation-render', currentDictation.abc);
+                clueBtn.innerText = "🎯 Само 1-ви такт (За дъска)";
+                isClueMode = false;
+            }
+        }
+
+        function printWorksheet() {
+            window.print();
         }
 
         function toggleNotesVisibility() {
@@ -1980,18 +2753,16 @@
                 
                 let currentPitch = baseNote;
                 const playbackNotes = [{ note: currentPitch, time: 0, duration: 0.8 }];
-                let abcBody = midiToABCNote(currentPitch) + " ";
+                const accState = {};
+                let abcBody = midiToABCNote(currentPitch, 'C', 'natural', accState) + " ";
                 let description = `Започни на тон <strong>${midiToBulgarianNoteName(currentPitch)}</strong>`;
 
                 for (let i = 0; i < steps; i++) {
-                    // Choose direction (up or down)
                     const up = Math.random() > 0.4;
-                    const intervalKey = intervalKeys[Math.floor(Math.random() * (intervalKeys.length - 1)) + 1]; // skip unison
+                    const intervalKey = intervalKeys[Math.floor(Math.random() * (intervalKeys.length - 1)) + 1];
                     const interval = INTERVALS_DATA[intervalKey];
 
                     let nextPitch = currentPitch + (up ? interval.semitones : -interval.semitones);
-                    
-                    // Keep pitch in vocal bounds
                     if (nextPitch < 55) {
                         nextPitch = currentPitch + interval.semitones;
                     } else if (nextPitch > 80) {
@@ -2004,7 +2775,7 @@
                         duration: 0.8
                     });
 
-                    abcBody += midiToABCNote(nextPitch) + " ";
+                    abcBody += midiToABCNote(nextPitch, 'C', 'natural', accState) + " ";
                     description += ` ➔ ${up ? 'нагоре' : 'надолу'} <strong>${interval.name}</strong> (до тон ${midiToBulgarianNoteName(nextPitch)})`;
                     currentPitch = nextPitch;
                 }
@@ -2018,7 +2789,6 @@
                 renderNotation('chain-notation-render', currentChain.abc);
 
             } else {
-                // Chord Progression (I - IV - V - I)
                 const grade = parseInt(document.getElementById('chains-grade').value) || 4;
                 let cadences = [['T53', 'D53', 'T53']];
                 if (grade === 2) {
@@ -2041,19 +2811,18 @@
                 }
                 const cad = cadences[Math.floor(Math.random() * cadences.length)];
 
-                // C major default
                 const baseTonic = 60;
                 const chordsPlay = [];
                 let abcNotes = "";
                 let description = "Каданс: ";
 
                 cad.forEach((cName, idx) => {
-                    let semitones = [0, 4, 7]; // I
-                    if (cName === 'S64') semitones = [0, 5, 9]; // IV (C-F-A)
-                    else if (cName === 'S6') semitones = [0, 3, 8]; // IV sext (E-A-c)
-                    else if (cName === 'D53') semitones = [-1, 2, 7]; // V (B-D-G)
-                    else if (cName === 'D64') semitones = [2, 5, 11]; // V quart (D-G-B)
-                    else if (cName === 'D7') semitones = [-1, 2, 5, 7]; // V7 (B-D-F-G)
+                    let semitones = [0, 4, 7];
+                    if (cName === 'S64' || cName === 'S53') semitones = [0, 5, 9];
+                    else if (cName === 'S6') semitones = [0, 5, 9];
+                    else if (cName === 'D53') semitones = [-1, 2, 7];
+                    else if (cName === 'D64') semitones = [2, 7, 11];
+                    else if (cName === 'D7') semitones = [-1, 2, 5, 7];
 
                     const pitches = semitones.map(s => baseTonic + s);
                     
@@ -2090,17 +2859,19 @@
         function playCurrentChain() {
             stopAudio();
             if (!currentChain) return;
+            initAudio();
 
-            const now = audioCtx ? audioCtx.currentTime : 0.1;
+            const synth = document.getElementById('dict-synth') ? document.getElementById('dict-synth').value : 'piano';
+            const now = audioCtx.currentTime + 0.1;
 
             if (currentChain.notes) {
                 currentChain.notes.forEach(item => {
-                    playTone(item.note, item.duration, now + item.time, 'piano');
+                    playTone(item.note, item.duration, now + item.time, synth, 0.82, 'legato');
                 });
             } else if (currentChain.chords) {
                 currentChain.chords.forEach(c => {
                     c.pitches.forEach(pitch => {
-                        playTone(pitch, 1.0, now + c.time, 'piano');
+                        playTone(pitch, 1.0, now + c.time, synth, 0.78, 'legato');
                     });
                 });
             }
@@ -2134,11 +2905,11 @@
             } else {
                 let allowed = Object.keys(CHORDS_DATA);
                 if (grade === 1) {
-                    allowed = ['Б53'];
+                    allowed = ['Б3', 'М3'];
                 } else if (grade === 2) {
-                    allowed = ['Б53', 'М53'];
+                    allowed = ['Б3', 'М3', 'Ум3', 'Ув3'];
                 } else if (grade === 4) {
-                    allowed = ['Б53', 'М53', 'Б6', 'М6', 'Б64', 'М64'];
+                    allowed = ['Б3', 'М3', 'Ум3', 'Ув3', 'Б6', 'М6', 'Б64', 'М64', 'D7'];
                 }
                 
                 allowed.forEach(key => {
@@ -2217,10 +2988,12 @@
         function playBuilderElement() {
             stopAudio();
             if (!currentBuilderElement) return;
+            initAudio();
 
-            const now = audioCtx ? audioCtx.currentTime : 0.1;
+            const synth = document.getElementById('dict-synth') ? document.getElementById('dict-synth').value : 'piano';
+            const now = audioCtx.currentTime + 0.1;
             currentBuilderElement.notes.forEach(item => {
-                playTone(item.note, item.duration, now + item.time, 'piano');
+                playTone(item.note, item.duration, now + item.time, synth, 0.82, 'legato');
             });
         }
 
@@ -2258,11 +3031,11 @@
                     meter = '4/4';
                 } else {
                     configLeaps = { step: true, third: true, fourthFifth: true, sixthSeventh: true, octave: true };
-                    configRhythms = { eighths: true, sixteenths: true, dotted: true, syncopation: true, triplet: true };
+                    configRhythms = { quarter: true, dotted: true };
                     meter = '7/8';
                 }
                 
-                const dict = generateMelodicDictationAlgo(key, meter, 4, configLeaps, configRhythms);
+                const dict = generateMelodicDictationAlgo(key, meter, 4, configLeaps, configRhythms, key.includes('m') ? 'harmonic' : 'natural');
                 currentSingingTask = dict;
 
                 document.getElementById('singing-meta-text').innerText = `Мелодия за пеене (a prima vista) в ${translateKeyToBG(key)}`;
@@ -2304,11 +3077,13 @@
         function playSingingReference() {
             stopAudio();
             if (!currentSingingTask) return;
+            initAudio();
 
-            const now = audioCtx ? audioCtx.currentTime : 0.1;
+            const synth = document.getElementById('dict-synth') ? document.getElementById('dict-synth').value : 'piano';
+            const now = audioCtx.currentTime + 0.1;
 
             if (currentSingingTask.type === 'card') {
-                playTone(currentSingingTask.baseNote, 2.0, now, 'piano');
+                playTone(currentSingingTask.baseNote, 2.0, now, synth, 0.85, 'legato');
             } else {
                 const key = currentSingingTask.key;
                 const baseNote = KEY_TONICS[key] || 60;
@@ -2316,7 +3091,7 @@
                 
                 const chordSteps = [0, 2, 4, 7];
                 chordSteps.forEach((stepIdx, idx) => {
-                    playTone(baseNote + scale[stepIdx], 0.6, now + idx * 0.4, 'piano');
+                    playTone(baseNote + scale[stepIdx], 0.6, now + idx * 0.4, synth, 0.82, 'legato');
                 });
             }
         }
@@ -2324,108 +3099,126 @@
         function playSingingFull() {
             stopAudio();
             if (!currentSingingTask) return;
+            initAudio();
 
-            const now = audioCtx ? audioCtx.currentTime : 0.1;
+            const synth = document.getElementById('dict-synth') ? document.getElementById('dict-synth').value : 'piano';
+            const now = audioCtx.currentTime + 0.1;
 
             if (currentSingingTask.type === 'card') {
-                playTone(currentSingingTask.baseNote, 0.8, now, 'piano');
-                playTone(currentSingingTask.targetNote, 1.5, now + 1.0, 'piano');
+                playTone(currentSingingTask.baseNote, 0.8, now, synth, 0.85, 'legato');
+                playTone(currentSingingTask.targetNote, 1.5, now + 1.0, synth, 0.85, 'legato');
             } else {
                 const beatDuration = 60 / 80;
                 currentSingingTask.playbackNotes.forEach(item => {
-                    playTone(item.note, item.duration * beatDuration, now + item.time * beatDuration, 'piano');
+                    playTone(item.note, item.duration * beatDuration, now + item.time * beatDuration, synth, 0.82, 'legato');
                 });
             }
         }
 
-        // ================= CLASS GRADUATION DEFAULTS =================
-        function applyGradeDictationDefaults(grade) {
-            grade = parseInt(grade);
-            
-            if (grade === 1) {
-                document.getElementById('dict-meter').value = '2/4';
-                document.getElementById('dict-length').value = '4';
-                document.getElementById('dict-tempo-val').value = '80';
-                
-                document.getElementById('leap-3rd').checked = false;
-                document.getElementById('leap-4th-5th').checked = false;
-                document.getElementById('leap-6th-7th').checked = false;
-                document.getElementById('leap-8ve').checked = false;
-            } else if (grade === 2) {
-                document.getElementById('dict-meter').value = '2/4';
-                document.getElementById('dict-length').value = '4';
-                
-                document.getElementById('leap-3rd').checked = true;
-                document.getElementById('leap-4th-5th').checked = false;
-                document.getElementById('leap-6th-7th').checked = false;
-                document.getElementById('leap-8ve').checked = false;
-            } else if (grade === 3) {
-                document.getElementById('dict-meter').value = '3/4';
-                document.getElementById('dict-length').value = '4';
-                
-                document.getElementById('leap-3rd').checked = true;
-                document.getElementById('leap-4th-5th').checked = true;
-                document.getElementById('leap-6th-7th').checked = false;
-                document.getElementById('leap-8ve').checked = false;
-            } else if (grade === 4 || grade === 5) {
-                document.getElementById('dict-meter').value = '4/4';
-                document.getElementById('dict-length').value = '4';
-                
-                document.getElementById('leap-3rd').checked = true;
-                document.getElementById('leap-4th-5th').checked = true;
-                document.getElementById('leap-6th-7th').checked = false;
-                document.getElementById('leap-8ve').checked = false;
-            } else if (grade >= 6 && grade <= 7) {
-                document.getElementById('dict-meter').value = '7/8';
-                document.getElementById('dict-length').value = '4';
-                
-                document.getElementById('leap-3rd').checked = true;
-                document.getElementById('leap-4th-5th').checked = true;
-                document.getElementById('leap-6th-7th').checked = true;
-                document.getElementById('leap-8ve').checked = false;
-            } else {
-                document.getElementById('dict-meter').value = '7/8';
-                document.getElementById('dict-length').value = '8';
-                
-                document.getElementById('leap-3rd').checked = true;
-                document.getElementById('leap-4th-5th').checked = true;
-                document.getElementById('leap-6th-7th').checked = true;
-                document.getElementById('leap-8ve').checked = true;
+        // ================= CLASS GRADUATION & PEDAGOGICAL PRESETS (DR. ELEONORA) =================
+        const CURRICULUM_PROFILES = {
+            general: {
+                1:  { meter: '2/4', length: 4, tempo: 72, scaleType: 'natural',  leaps: { step: true, third: false, fourthFifth: false, sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: false, dotted: false, syncopation: false, triplet: false } },
+                2:  { meter: '2/4', length: 4, tempo: 76, scaleType: 'natural',  leaps: { step: true, third: true,  fourthFifth: false, sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: false, dotted: false, syncopation: false, triplet: false } },
+                3:  { meter: '3/4', length: 4, tempo: 80, scaleType: 'natural',  leaps: { step: true, third: true,  fourthFifth: false, sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: false, dotted: false, syncopation: false, triplet: false } },
+                4:  { meter: '4/4', length: 4, tempo: 82, scaleType: 'harmonic', leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: false, dotted: true,  syncopation: false, triplet: false } },
+                5:  { meter: '5/8', length: 4, tempo: 96, scaleType: 'natural',  leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: false, octave: false }, rhythms: { quarter: true, dotted: false } },
+                6:  { meter: '7/8', length: 4, tempo: 100,scaleType: 'harmonic', leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: false, octave: false }, rhythms: { quarter: true, dotted: true } },
+                7:  { meter: '4/4', length: 8, tempo: 86, scaleType: 'harmonic', leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: false, triplet: false } },
+                8:  { meter: '4/4', length: 8, tempo: 88, scaleType: 'melodic',  leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: true,  triplet: false } },
+                9:  { meter: '9/8', length: 8, tempo: 104,scaleType: 'harmonic', leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: false }, rhythms: { quarter: true, dotted: true } },
+                10: { meter: '4/4', length: 8, tempo: 90, scaleType: 'melodic',  leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: false }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: true,  triplet: true } },
+                11: { meter: '7/8', length: 8, tempo: 112,scaleType: 'harmonic', leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { quarter: true, dotted: true } },
+                12: { meter: '4/4', length: 8, tempo: 92, scaleType: 'biharmonic',leaps:{ step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: true,  triplet: true } }
+            },
+            music: {
+                1:  { meter: '2/4', length: 4, tempo: 76, scaleType: 'natural',  leaps: { step: true, third: true,  fourthFifth: false, sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: false, dotted: false, syncopation: false, triplet: false } },
+                2:  { meter: '3/4', length: 4, tempo: 80, scaleType: 'harmonic', leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: false, triplet: false } },
+                3:  { meter: '4/4', length: 8, tempo: 84, scaleType: 'melodic',  leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: false, octave: false }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: true,  triplet: false } },
+                4:  { meter: '5/8', length: 8, tempo: 104,scaleType: 'harmonic', leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: false }, rhythms: { quarter: true, dotted: true } },
+                5:  { meter: '7/8', length: 8, tempo: 112,scaleType: 'melodic',  leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { quarter: true, dotted: true } },
+                6:  { meter: '4/4', length: 8, tempo: 88, scaleType: 'melodic',  leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: true,  triplet: true } },
+                7:  { meter: '9/8', length: 8, tempo: 116,scaleType: 'biharmonic',leaps:{ step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { quarter: true, dotted: true } },
+                8:  { meter: '11/8',length: 8, tempo: 120,scaleType: 'melodic',  leaps: { step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { quarter: true, dotted: true } },
+                9:  { meter: '4/4', length: 8, tempo: 92, scaleType: 'biharmonic',leaps:{ step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: true,  triplet: true } },
+                10: { meter: '7/8', length: 8, tempo: 124,scaleType: 'biharmonic',leaps:{ step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { quarter: true, dotted: true } },
+                11: { meter: '11/8',length: 8, tempo: 126,scaleType: 'biharmonic',leaps:{ step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { quarter: true, dotted: true } },
+                12: { meter: '4/4', length: 12,tempo: 96, scaleType: 'biharmonic',leaps:{ step: true, third: true,  fourthFifth: true,  sixthSeventh: true,  octave: true  }, rhythms: { eighths: true, sixteenths: true,  dotted: true,  syncopation: true,  triplet: true } }
+            }
+        };
+
+        function applyPedagogicalPreset(presetId) {
+            const preset = PEDAGOGICAL_PRESETS[presetId];
+            if (!preset) return;
+
+            if (document.getElementById('dict-meter')) document.getElementById('dict-meter').value = preset.meter;
+            if (document.getElementById('dict-length')) document.getElementById('dict-length').value = String(preset.length);
+            if (document.getElementById('dict-tempo-val')) document.getElementById('dict-tempo-val').value = String(preset.tempo);
+            if (document.getElementById('dict-scale-type')) {
+                updateScaleTypeOptions();
+                document.getElementById('dict-scale-type').value = preset.scaleType;
             }
 
+            if (document.getElementById('leap-3rd')) document.getElementById('leap-3rd').checked = !!preset.leaps.third;
+            if (document.getElementById('leap-4th-5th')) document.getElementById('leap-4th-5th').checked = !!preset.leaps.fourthFifth;
+            if (document.getElementById('leap-6th-7th')) document.getElementById('leap-6th-7th').checked = !!preset.leaps.sixthSeventh;
+            if (document.getElementById('leap-8ve')) document.getElementById('leap-8ve').checked = !!preset.leaps.octave;
+
             updateRhythmicOptions();
-            
-            if (grade === 1) {
-                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = false;
-                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = false;
-                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = false;
-                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = false;
-                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = false;
-            } else if (grade === 2) {
-                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = true;
-                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = false;
-                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = false;
-                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = false;
-                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = false;
-            } else if (grade === 3) {
-                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = true;
-                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = false;
-                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = true;
-                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = false;
-                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = false;
-            } else if (grade === 4 || grade === 5) {
-                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = true;
-                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = true;
-                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = true;
-                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = false;
-                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = false;
+            const isUneven = ['3/8', '6/8', '12/8', '5/8', '7/8', '9/8', '11/8'].includes(preset.meter);
+            if (isUneven) {
+                if (document.getElementById('rhy-uneven-quarter')) document.getElementById('rhy-uneven-quarter').checked = !!preset.rhythms.quarter;
+                if (document.getElementById('rhy-uneven-dotted')) document.getElementById('rhy-uneven-dotted').checked = !!preset.rhythms.dotted;
             } else {
-                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = true;
-                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = true;
-                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = true;
-                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = true;
-                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = true;
+                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = !!preset.rhythms.eighths;
+                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = !!preset.rhythms.sixteenths;
+                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = !!preset.rhythms.dotted;
+                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = !!preset.rhythms.syncopation;
+                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = !!preset.rhythms.triplet;
             }
+
+            window.activePedagogicalPreset = preset;
+            generateDictation();
+        }
+
+        function applyGradeDictationDefaults(grade, schoolType = null) {
+            grade = parseInt(grade) || 4;
+            const schoolEl = document.getElementById('dict-school-type');
+            const resolvedSchool = schoolType || (schoolEl ? schoolEl.value : 'general');
+            const table = CURRICULUM_PROFILES[resolvedSchool] || CURRICULUM_PROFILES.general;
+            const profile = table[grade] || table[4];
+
+            window.activePedagogicalPreset = null;
+            const presetEl = document.getElementById('dict-preset');
+            if (presetEl) presetEl.value = "";
+
+            if (document.getElementById('dict-meter')) document.getElementById('dict-meter').value = profile.meter;
+            if (document.getElementById('dict-length')) document.getElementById('dict-length').value = String(profile.length);
+            if (document.getElementById('dict-tempo-val')) document.getElementById('dict-tempo-val').value = String(profile.tempo);
+
+            updateScaleTypeOptions();
+            if (document.getElementById('dict-scale-type')) {
+                document.getElementById('dict-scale-type').value = profile.scaleType;
+            }
+
+            if (document.getElementById('leap-3rd')) document.getElementById('leap-3rd').checked = !!profile.leaps.third;
+            if (document.getElementById('leap-4th-5th')) document.getElementById('leap-4th-5th').checked = !!profile.leaps.fourthFifth;
+            if (document.getElementById('leap-6th-7th')) document.getElementById('leap-6th-7th').checked = !!profile.leaps.sixthSeventh;
+            if (document.getElementById('leap-8ve')) document.getElementById('leap-8ve').checked = !!profile.leaps.octave;
+
+            updateRhythmicOptions();
+            const isUneven = ['3/8', '6/8', '12/8', '5/8', '7/8', '9/8', '11/8'].includes(profile.meter);
+            if (isUneven) {
+                if (document.getElementById('rhy-uneven-quarter')) document.getElementById('rhy-uneven-quarter').checked = !!profile.rhythms.quarter;
+                if (document.getElementById('rhy-uneven-dotted')) document.getElementById('rhy-uneven-dotted').checked = !!profile.rhythms.dotted;
+            } else {
+                if (document.getElementById('rhy-eighths')) document.getElementById('rhy-eighths').checked = !!profile.rhythms.eighths;
+                if (document.getElementById('rhy-sixteenths')) document.getElementById('rhy-sixteenths').checked = !!profile.rhythms.sixteenths;
+                if (document.getElementById('rhy-dotted')) document.getElementById('rhy-dotted').checked = !!profile.rhythms.dotted;
+                if (document.getElementById('rhy-syncopation')) document.getElementById('rhy-syncopation').checked = !!profile.rhythms.syncopation;
+                if (document.getElementById('rhy-triplet')) document.getElementById('rhy-triplet').checked = !!profile.rhythms.triplet;
+            }
+            generateDictation();
         }
 
         function applyGradeChainsDefaults(grade) {
