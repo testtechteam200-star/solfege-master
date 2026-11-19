@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5"/>
+      <stop offset="50%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#fef08a"/>
+      <stop offset="70%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="staffGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.05)"/>
+      <stop offset="20%" stop-color="rgba(255,255,255,0.25)"/>
+      <stop offset="80%" stop-color="rgba(255,255,255,0.25)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.05)"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#fde047" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="3"/>
+
+  <!-- Subtle Ambient Glow -->
+  <circle cx="256" cy="240" r="160" fill="white" opacity="0.08" filter="blur(30px)"/>
+
+  <!-- Musical Staff Lines (5 lines) -->
+  <g stroke="url(#staffGrad)" stroke-width="3.5" stroke-linecap="round">
+    <line x1="64" y1="180" x2="448" y2="180"/>
+    <line x1="64" y1="218" x2="448" y2="218"/>
+    <line x1="64" y1="256" x2="448" y2="256"/>
+    <line x1="64" y1="294" x2="448" y2="294"/>
+    <line x1="64" y1="332" x2="448" y2="332"/>
+  </g>
+
+  <!-- Musical Notes and Accents on Staff -->
+  <g opacity="0.45" fill="#fef08a">
+    <!-- Mini eighth note top-right -->
+    <ellipse cx="380" cy="180" rx="14" ry="10" transform="rotate(-20 380 180)"/>
+    <line x1="392" y1="176" x2="392" y2="124" stroke="#fef08a" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M392 124 Q410 134 408 152" fill="none" stroke="#fef08a" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Mini note head left -->
+    <ellipse cx="130" cy="294" rx="13" ry="9.5" transform="rotate(-20 130 294)"/>
+    <line x1="141" y1="290" x2="141" y2="238" stroke="#fef08a" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Treble Clef (G-Clef) Hero Graphic -->
+  <g filter="url(#glow)">
+    <path fill="url(#goldGrad)" fill-rule="evenodd" d="
+      M 268 96
+      C 264 96 258 100 255 106
+      C 248 119 245 138 245 162
+      C 245 198 253 234 256 262
+      C 248 252 238 245 226 242
+      C 205 238 184 251 176 272
+      C 167 293 172 319 188 335
+      C 202 349 223 355 242 352
+      C 248 351 254 348 259 344
+      C 257 372 254 397 246 414
+      C 240 426 230 434 218 434
+      C 204 434 194 425 194 414
+      C 194 404 201 396 211 395
+      C 213 395 215 395 217 396
+      C 218 391 214 384 207 382
+      C 194 380 180 392 180 411
+      C 180 431 197 448 221 448
+      C 243 448 261 433 271 412
+      C 281 391 285 362 287 325
+      C 298 333 312 336 326 333
+      C 344 329 358 316 363 298
+      C 369 275 360 252 342 238
+      C 328 227 308 223 290 227
+      C 287 212 283 194 280 174
+      C 278 155 278 138 281 124
+      C 283 113 286 106 288 103
+      C 289 101 286 96 268 96 Z
+      M 264 285
+      C 267 305 272 320 278 327
+      C 272 333 264 336 256 335
+      C 238 335 224 324 220 307
+      C 216 292 222 278 234 271
+      C 245 265 257 269 264 285 Z
+      M 288 245
+      C 304 243 319 249 328 259
+      C 336 268 338 280 334 292
+      C 330 304 320 312 308 313
+      C 299 313 292 309 288 303
+      C 287 284 287 264 288 245 Z
+      M 261 176
+      C 259 157 259 140 262 128
+      C 264 121 268 116 270 116
+      C 271 116 270 122 268 133
+      C 266 146 264 160 261 176 Z
+    "/>
+  </g>
+</svg>

@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "Солфеж Асистент — Преподавателски кабинет",
+  "short_name": "Солфеж",
+  "description": "Генератор на диктовки, слухови вериги, акорди и интонационни упражнения (1–12 клас)",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090d16",
+  "theme_color": "#6366f1",
+  "lang": "bg",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
