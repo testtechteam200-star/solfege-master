@@ -1,4 +1,4 @@
-const CACHE_NAME = 'solfege-master-v2';
+const CACHE_NAME = 'solfege-master-v3';
 
 const CORE_ASSETS = [
   './',
